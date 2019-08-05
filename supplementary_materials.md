@@ -7,7 +7,9 @@ This file contains details of specific methods for the PGxMine project.
 The list of drugs to extract and map is created by the createDrugList.py script. This uses MeSH, DrugBank and PharmGKB drug lists to create a mapping file from MeSH ID to PharmGKB ID. It also provides a normalized name using the DrugBank name, and flags whether the drug is a cancer treatment (if 'Antineoplastic' appears in a DrugBank category). 
 
 It removes drugs in categories: 'Elements','Adenine Nucleotides','Sweetening Agents','Salt Solutions','Supplements','Solvents','Electrolyte Solutions','Food Additives','Food','Lactates','Diluents','Gases','Mineral Supplements','Basic Lotions and Liniments','Phosphate salts','Potassium Salt'
+
 It overrides filters to allow: 'fludarabine', 'nilotinib', 'diamorphine', 'cocaine', 'lopinavir', 'flucloxacillin', 'isoniazid', 'hydrochlorothiazide', 'tolbutamide', 'streptomycin', 'ampicillin', 'phenobarbital', 'azithromycin', 'tenofovir', 'peramivir', 'artemisinin', 'lapatinib', 'rociletinib'
+
 It specifically removes the following chemicals: 'Cholesterol','Carbon dioxide','Adenine','Guanine','Thymine','Uracil','Cytosine','Adenosine','Guanosine','5-Methyluridine','Uridine','Cytidine','Deoxyadenosine','Deoxyguanosine','Thymidine','Deoxyuridine','Deoxycytidine','Heparin','Hydrocortisone','Estradiol','Tretinoin','Testosterone','Progesterone','Melatonin'
 
 It also removes chemicals without any product names or FDA labels. To supplement DrugBank and PharmGKB MeSH mappings, it tries exact matching against MeSH terms with the name of the chemical, and the name of the chemical + 'hydrochloride'.
