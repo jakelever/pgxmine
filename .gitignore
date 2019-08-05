@@ -17,3 +17,6 @@ dbsnp_selected.tsv
 full_database.xml
 gene_names.tsv
 selected_chemicals.json
+
+annotations.variant_other.bioc.xml
+annotations.variant_star_rs.bioc.xml

@@ -40,6 +40,10 @@ python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.bgz) --pubtato
 
 # Create the drug list with mappings from MeSH IDs to PharmGKB IDs (with some filtering using DrugBank categories)
 python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugbank full_database.xml --pharmgkb data/drugs.tsv --outFile selected_chemicals.json
+
+# Unzip the annotated training data of pharmacogenomics relations
+gunzip -c annotations.variant_other.bioc.xml.gz > annotations.variant_other.bioc.xml
+gunzip -c annotations.variant_star_rs.bioc.xml.gz > annotations.variant_star_rs.bioc.xml
 ```
 
 # Example Run
