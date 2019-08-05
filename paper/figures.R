@@ -1,7 +1,7 @@
 source('dependencies.R')
 
-sentences <- fread('pgmine_sentences.tsv',sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
-collated <- fread('pgmine_collated.tsv',sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
+sentences <- fread('pgxmine_sentences.tsv',sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
+collated <- fread('pgxmine_collated.tsv',sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
 
 paper.mentionCount <- prettyNum(nrow(sentences),big.mark=',')
 paper.pmidCount <- prettyNum(length(unique(sentences$pmid)),big.mark=',')

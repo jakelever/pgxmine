@@ -55,8 +55,8 @@ pharmGKB3 <- NA
 pharmGKB$Chemical_ID_Variant <- paste(pharmGKB$Chemical_ID,pharmGKB$Variant)
 pharmGKB$Chemical_ID_Variant[pharmGKB$Chemical_ID==''] <- ''
 
-sentencesFilename <- 'pgmine_sentences.tsv'
-collatedFilename <- 'pgmine_collated.tsv'
+sentencesFilename <- 'pgxmine_sentences.tsv'
+collatedFilename <- 'pgxmine_collated.tsv'
 collated <- fread(collatedFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
 
 sentences <- fread(sentencesFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
@@ -88,10 +88,10 @@ associationComparisonPlot <- grid.arrange(associationComparisonPlot,bottom='Chem
 paper.pharmGKBPercentageOverlap <- round(100*sum(pgMineAssociations %in% pharmGKBAssociations) / length(pgMineAssociations),1)
 paper.associationsNotInPharmGKB <- prettyNum(length(pgMineAssociations) - sum(pgMineAssociations %in% pharmGKBAssociations),big.mark=',')
 
-pgmine_PMIDs <- unique(sentences$pmid)
+pgxmine_PMIDs <- unique(sentences$pmid)
 
 pmidComparisonPlot <- venn.diagram(
-  x = list(PharmGKB=pharmGKB_pmids , PGmine=pgmine_PMIDs ),
+  x = list(PharmGKB=pharmGKB_pmids , PGmine=pgxmine_PMIDs ),
   scaled=T,
   fill = c("grey", "white"),
   cat.fontface = 2,

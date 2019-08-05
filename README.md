@@ -4,7 +4,7 @@ This is the codebase for the PGxMine project to using text-mining to identify pa
 
 # Viewing the Data
 
-The data can be viewed through the [Shiny app](http://bionlp.bcgsc.ca/pgxmine/).
+The data can be viewed through the [Shiny app](http://bionlp.bcgsc.ca/pgxmine/). It can be downloaded as TSV files at [Zenodo](https://doi.org/10.5281/zenodo.3360930).
 
 To run a local instance of the PGxmine viewer, the R Shiny code can be found in [shiny/](https://github.com/jakelever/pgxmine/tree/master/shiny) and installation instructions are found there too.
 

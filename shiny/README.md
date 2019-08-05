@@ -10,8 +10,11 @@ Execute the installDependencies.R script to install a number of package dependen
 
 ## Get PGxMine data
 
+Download the [annotations.zip](https://www.pharmgkb.org/downloads), unzip and put in the same directory.
+
 ## Get PharmGKB data
 
+Download the collated and sentences TSV file from [Zenodo](https://doi.org/10.5281/zenodo.3360930) and place in the same directory.
 
 ## Run the app
 

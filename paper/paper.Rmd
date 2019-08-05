@@ -14,7 +14,7 @@ output:
 #  bookdown::html_document2
   bookdown::word_document2
 #  bookdown::pdf_document2
-bibliography: pgmine.bibtex
+bibliography: pgxmine.bibtex
 csl: world-neurosurgery.csl
 ---
 
@@ -103,7 +103,7 @@ We then created two relation classifiers, one for each for the two sets. We used
 
 We then used the PubRunner infrastructure to apply these two classifiers across all the aligned sentences [@anekalla2017pubrunner]. This enabled the use of a compute cluster to quickly classify sentences as to whether they contain pharmacogenomic information. We then outputted relations along with the normalized form of the chemical and genes with other metadata. The gene information was included for star alleles and for variants normalized to dbSNP if it could be extracted from dbSNP. Metadata from the source paper is also included such as PubMed ID, title, journal, publication year and section within the paper. We also provide a version of the sentence which has HTML characters escaped and the entities in the relation highlighted with basic HTML tags for easy viewing. This output is the unfiltered version available.
 
-We filtered relations that were scored lower than the previously selected threshold of 0.75 to reduce the false positive rate to create the pgmine_filtered.tsv file. Finally, we collated the results by variant, chemical and where applicable gene IDs to find the total number of papers that discuss each variant/chemical association. This provides a rough metric of the importance of each association and allows a ranking to see which frequently discussed associations should be curated into PharmGKB. This collated version is released as the pgmine_collated.tsv file.
+We filtered relations that were scored lower than the previously selected threshold of 0.75 to reduce the false positive rate to create the pgxmine_filtered.tsv file. Finally, we collated the results by variant, chemical and where applicable gene IDs to find the total number of papers that discuss each variant/chemical association. This provides a rough metric of the importance of each association and allows a ranking to see which frequently discussed associations should be curated into PharmGKB. This collated version is released as the pgxmine_collated.tsv file.
 
 ### Mapping to PharmGKB
 

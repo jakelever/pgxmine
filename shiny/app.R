@@ -12,13 +12,13 @@ library(stringr)
 wd <- setwd(".")
 setwd(wd)
 
-sentencesFilename <- 'pgmine_sentences.tsv'
-collatedFilename <- 'pgmine_collated.tsv'
+sentencesFilename <- 'pgxmine_sentences.tsv'
+collatedFilename <- 'pgxmine_collated.tsv'
 
 sentencesFilename <- normalizePath(sentencesFilename)
 collatedFilename <- normalizePath(collatedFilename)
 fileInfo <- file.info(sentencesFilename)
-pgmine_modifiedDate <- strsplit(as.character(fileInfo$mtime), ' ')[[1]][1]
+pgxmine_modifiedDate <- strsplit(as.character(fileInfo$mtime), ' ')[[1]][1]
 
 sentences <- fread(sentencesFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
 collated <- fread(collatedFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
@@ -143,7 +143,7 @@ associationTableExplanation <- "<br /><b>Association Table:</b><br />The table b
 
 paperSentenceTableExplanation <- "<br /><br /><br /><b>Sentence Table:</b><br />Select a chemical-variant association in the table above to see sentences and publication information<br /><br />"
 
-lastModifiedText = paste("PGmine updated on ",pgmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
+lastModifiedText = paste("PGmine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
 
 
 
@@ -523,7 +523,7 @@ server <- function(input, output, session) {
   
   output$download_collated_all <- downloadHandler(
     filename = function() {
-      return("pgmine_collated.tsv")
+      return("pgxmine_collated.tsv")
     },
     content = function(file) {
       write.table(collated, file, row.names = FALSE, sep='\t', quote=F)
@@ -532,7 +532,7 @@ server <- function(input, output, session) {
   
   output$download_collated_shown <- downloadHandler(
     filename = function() {
-      return("pgmine_collated_subset.tsv")
+      return("pgxmine_collated_subset.tsv")
     },
     content = function(file) {
       outdata <- tableData()
@@ -542,7 +542,7 @@ server <- function(input, output, session) {
   
   output$download_sentences_all <- downloadHandler(
     filename = function() {
-      return("pgmine_sentences.tsv")
+      return("pgxmine_sentences.tsv")
     },
     content = function(file) {
       write.table(sentences, file, row.names = FALSE, sep='\t', quote=F)
@@ -551,7 +551,7 @@ server <- function(input, output, session) {
   
   output$download_sentences_shown <- downloadHandler(
     filename = function() {
-      return("pgmine_sentences_selectedbiomarker.tsv")
+      return("pgxmine_sentences_selectedbiomarker.tsv")
     },
     content = function(file) {
       if(length(input$data_table_rows_selected)>0) {
@@ -569,7 +569,7 @@ server <- function(input, output, session) {
   
   output$download_sentences_above <- downloadHandler(
     filename = function() {
-      return("pgmine_sentences_multiplebiomarkers.tsv")
+      return("pgxmine_sentences_multiplebiomarkers.tsv")
     },
     content = function(file) {
       table <- tableData()
