@@ -19,7 +19,6 @@ if __name__ == '__main__':
 	collated = defaultdict(set)
 	collatedMatchingID = {}
 
-	#sentenceKeyFields = 'pmid,title,journal,journal_short,year,month,day,section,subsection,chemical_mesh_id,chemical_pharmgkb_id,chemical_drugbank_id,chemical_text,chemical_normalized,variant_id,variant_type,variant_text,variant_normalized,gene_ids,gene_names,score,sentence'
 	collatedKeyFields = 'chemical_mesh_id,chemical_pharmgkb_id,chemical_drugbank_id,chemical_normalized,variant_id,variant_normalized,variant_type,gene_ids,gene_names'
 
 	inputFiles = sorted( [ os.path.join(args.inData,f) for f in os.listdir(args.inData) if f.endswith('.tsv') ] )
@@ -32,9 +31,7 @@ if __name__ == '__main__':
 	with open(args.outUnfiltered,'w') as outUnfiltered, open(args.outSentences,'w') as outSentences:
 		for inputFile in inputFiles:
 			with open(inputFile) as inF:
-				#inTSV = csv.reader(inF,delimiter='\t')
 				
-				#headers = next(inTSV, None)
 				headers = inF.readline().strip('\n').split('\t')
 				if inputFilesHeader is None:
 					inputFilesHeader = headers
@@ -43,7 +40,6 @@ if __name__ == '__main__':
 				else:
 					assert inputFilesHeader == headers, "Headers don't match expected in file %s" % inputFile
 
-				#for i,row in enumerate(inTSV):
 				for i,line in enumerate(inF):
 					row = line.strip('\n').split('\t')
 

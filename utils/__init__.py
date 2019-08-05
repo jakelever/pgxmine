@@ -4,12 +4,9 @@ import html
 
 aminoAcidInfo = [('ALA','A'),('ARG','R'),('ASN','N'),('ASP','D'),('CYS','C'),('GLU','E'),('GLN','Q'),('GLY','G'),('HIS','H'),('ILE','I'),('LEU','L'),('LYS','K'),('MET','M'),('PHE','F'),('PRO','P'),('SER','S'),('THR','T'),('TRP','W'),('TYR','Y'),('VAL','V'),('ALANINE','A'), ('CYSTEINE','C'), ('ASPARTICACID','D'), ('GLUTAMICACID','E'), ('PHENYLALANINE','F'), ('GLYCINE','G'), ('HISTIDINE','H'), ('ISOLEUCINE','I'), ('LYSINE','K'), ('LEUCINE','L'), ('METHIONINE','M'), ('ASPARAGINE','N'), ('PROLINE','P'), ('GLUTAMINE','Q'), ('ARGININE','R'), ('SERINE','S'), ('THREONINE','T'), ('VALINE','V'), ('TRYPTOPHAN','W'), ('TYROSINE','Y'),('STOP','X'),('TER','X')]
 aminoAcidMap = { big:small for big,small in aminoAcidInfo }
-#for letter in string.ascii_lowercase:
-#	aminoAcidMap[letter] = letter.upper()
 for letter in 'ABCDEFGHIKLMNPQRSTVWYZX':
 	aminoAcidMap[letter] = letter
 aminoAcidMap['*'] = '*'
-#aminoAcidMap['STOP'] = 'stop'
 
 def normalizeMutation(mention):
 	if mention.strip().startswith('*'):
@@ -191,16 +188,11 @@ def normalizeMutation(mention):
 		for mapFrom,mapTo in mapping:
 			regex = regex.replace(unique[mapFrom], mapTo)
 
-		#if patternIn == '93G>A':
-		#	print(regex)
-		#	assert False
-		#print(regex)
 		match = re.match(regex, mention, re.IGNORECASE)
 		if match:
 			d = { key:value.upper() for key,value in match.groupdict().items() }
 			if 'num' in d:
 				d['num'] = d['num'].rstrip('-+')
-			#	d['num'] = d['num'][0] + d['num'][1:].replace('-','_')
 
 			if patternOut == 'c.G>A':
 				return "c.%s>%s" % (d['from'],d['to1'])

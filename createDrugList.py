@@ -77,7 +77,6 @@ if __name__ == '__main__':
 	pharmGKB_name2id = {}
 
 	pharmGKB_hasMesh = {}
-	#MeSH:C400278(erlotinib)
 	csv.field_size_limit(sys.maxsize)
 	with open(args.pharmgkb) as f:
 		reader = csv.DictReader(f, delimiter='\t')

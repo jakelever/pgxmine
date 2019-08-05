@@ -22,7 +22,6 @@ def getNextSourceEntityID(doc):
 
 def annotateStarAlleles(corpus):
 	for doc in corpus.documents:
-		#print(doc.text)
 
 		genes = [ e for e in doc.entities if e.entityType == 'Gene' ]
 
@@ -31,11 +30,9 @@ def annotateStarAlleles(corpus):
 			geneID = gene.metadata['conceptid']
 
 			offset = geneEnd
-			#print(doc.text[offset:])
 			regex = '^(,|and|or|/|\s|\+)*(?P<main>\*\s*[0-9]([\w:]*\w+)?)'
 			star = re.search(regex,doc.text[offset:])
 			while star:
-				#print(star)
 				_,length = star.span()
 
 				startPos,endPos = star.span('main')
@@ -53,41 +50,10 @@ def annotateStarAlleles(corpus):
 				star = re.search(regex,doc.text[offset:])
 
 
-def annotateStarAlleles2(corpus):
-	for doc in corpus.documents:
-		#print(doc.text)
-		#print('-'*30)
-		geneEnds = set([ e.position[0][1] for e in doc.entities if e.entityType == 'Gene' ])
-
-		if geneEnds:
-			for candidate in re.finditer('\s*\*\s*\w+', doc.text):
-				#print(candidate)
-				#print(dir(candidate))
-				startPos,endPos = candidate.span()
-				text = candidate.group()
-				#print(startPos, geneEnds)
-
-				if startPos in geneEnds:
-					sourceEntityID = getNextSourceEntityID(doc)
-					alleleName = text.strip()[1:].strip()
-					conceptid = '* %s' % alleleName
-					starAllele = kindred.Entity('Mutation',text,[(startPos,endPos)],sourceEntityID=sourceEntityID,metadata={'conceptid':conceptid})
-					doc.addEntity(starAllele)
-					#doc.entities.append(starAllele)
-
-					#for sentence in doc.sentences:
-					#	overlappingTokens = [ i for i,t in enumerate(sentence.tokens) if not (t.endPos < startPos or t.startPos > endPos) ]
-					#	if overlappingTokens:
-					#		sentence.addEntityAnnotation(starAllele,overlappingTokens)
-
-			# Double check that there aren't any duplicate sourceEntityIDs
-			assert len(doc.entities) == len(set( e.sourceEntityID for e in doc.entities) )
-
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser('Identify sentences that are potentially relevant to PharmGKB')
 	parser.add_argument('--inBioc',required=True,type=str,help='BioC file annotated with GNormPlus, tmChem and tmVar')
 	parser.add_argument('--filterTermsFile',required=True,type=str,help='Terms used to filter sentences to enrich for pharmacogenomics relations')
-	#parser.add_argument('--selectedChemicalsFile',required=True,type=str,help='List of selected chemicals to use')
 	parser.add_argument('--outBioc',required=True,type=str,help='Output BioC file with identified sentences')
 	args = parser.parse_args()
 
@@ -96,15 +62,9 @@ if __name__ == '__main__':
 	with open(args.filterTermsFile,'r') as f:
 		filterTerms = [ line.strip().lower() for line in f ]
 
-	#with open(args.selectedChemicalsFile,'r') as f:
-	#	selectedChemicals = set([ line.strip().lower() for line in f ])
-
 	for corpus in kindred.iterLoad('biocxml',args.inBioc):
 		corpus = filterCorpus(corpus,filterTerms)
 
-		#for doc in corpus.documents:
-		#	doc.entities = [ e for e in doc.entities if (e.entityType != 'Chemical' or e.text.lower() in selectedChemicals) ]
-		#corpus.documents = [ doc for doc in corpus.documents if len(doc.entities) > 0 ]
 		annotateStarAlleles(corpus)
 
 		corpusEntityTypes = [ set( e.entityType for e in doc.entities ) for doc in corpus.documents ]
@@ -119,21 +79,11 @@ if __name__ == '__main__':
 				sentenceLower = sentence.text.lower()
 				hasAnyFilterTerm = any ( ft in sentenceLower for ft in filterTerms )
 
-				#if not hasAnyFilterTerm:
-				#	continue
-
-				#if sentence.text.count(';') >= 5:
-				#	continue
-
 				entityTypes = set([ entity.entityType for entity,tokenIndices in sentence.entityAnnotations ])
 				entityInfo = [ (e.entityType,e.text) for e,tokenIndices in sentence.entityAnnotations ]
-				#print(hasAnyFilterTerm, entityInfo)
-				#print(sentence.text)
-				#print('-'*30)
 
 				hasMutation = "Mutation" in entityTypes
 				hasChemical = "Chemical" in entityTypes
-				#print(sentence.text, hasVariant, hasChemical)
 
 				if hasMutation and hasChemical:
 					sentenceStart = sentence.tokens[0].startPos
