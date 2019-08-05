@@ -3,3 +3,17 @@
 .snakemake/
 __pycache__
 *.pyc
+
+data/
+
+example/aligned.bioc.xml
+example/sentences.bioc.xml
+example/kb.tsv
+example/mini_unfiltered.tsv
+example/mini_collated.tsv
+example/mini_sentences.tsv
+
+dbsnp_selected.tsv
+full_database.xml
+gene_names.tsv
+selected_chemicals.json
