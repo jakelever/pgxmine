@@ -1,0 +1,31 @@
+name: PGxMine
+version: 0.1
+url: https://github.com/jakelever/pgxmine
+resources:
+   full:
+      - PUBMED:
+         format: bioc
+      - PMCOA:
+         format: bioc
+      - PMCAMC:
+         format: bioc
+   test:
+      - PUBMED_CUSTOM:
+         pmids: 26736037,26389554
+         format: bioc
+         rename: PUBMED
+      - PMCOA_CUSTOM:
+         pmcids: 5846849
+         format: bioc
+         rename: PMCOA
+run:
+   - python align.py --inBioc {IN:PUBMED/%} --annotations <(zcat data/bioconcepts2pubtatorcentral.gz) --outBioc {OUT:aligned/%.xml}
+   - python align.py --inBioc {IN:PMCOA/%} --annotations <(zcat data/bioconcepts2pubtatorcentral.gz) --outBioc {OUT:aligned/%.xml}
+   - python align.py --inBioc {IN:PMCAMC/%} --annotations <(zcat data/bioconcepts2pubtatorcentral.gz) --outBioc {OUT:aligned/%.xml}
+   - python findPGxSentences.py --inBioc {IN:aligned/%} --filterTermsFile pgx_filter_terms.txt --outBioc {OUT:sentences/%}
+   - python createKB.py --trainingFiles annotations.variant_star_rs.bioc.xml,annotations.variant_other.bioc.xml --inBioC {IN:sentences/%} --selectedChemicals selected_chemicals.json --dbsnp dbsnp_selected.tsv --variantStopwords stopword_variants.txt --genes gene_names.tsv  --outKB {OUT:kb/%.tsv}
+   - python filterAndCollate.py --inData {IN:kb} --outUnfiltered {OUT:pgxmine_unfiltered.tsv} --outCollated {OUT:pgxmine_collated.tsv} --outSentences {OUT:pgxmine_sentences.tsv}
+output:
+   - pgxmine_unfiltered.tsv
+   - pgxmine_collated.tsv
+   - pgxmine_sentences.tsv
