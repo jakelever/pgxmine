@@ -29,3 +29,4 @@ output:
    - pgxmine_unfiltered.tsv
    - pgxmine_collated.tsv
    - pgxmine_sentences.tsv
+output_description_file: output_description.md
