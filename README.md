@@ -80,17 +80,17 @@ Here is a summary of the main script files. The pubrunner.yml file is the master
 
 ## Setup scripts
 
-- **createDrugList.py**: Creates the list of drugs and drug mappings from MeSH IDs to PharmGKB IDs with some filtering by categories
-- **linkRSIDToGeneName.py**: Extracts gene names from dbSNP associated with rsIDs
-- **linkStarToRSID.py**: Some rudimentary text mining to link star alleles with a specific rsID
-- **prCurve.py**: Calculate PR curves for the classifiers
+- **[createDrugList.py](https://github.com/jakelever/pgxmine/blob/master/createDrugList.py)**: Creates the list of drugs and drug mappings from MeSH IDs to PharmGKB IDs with some filtering by categories
+- **[linkRSIDToGeneName.py](https://github.com/jakelever/pgxmine/blob/master/linkRSIDToGeneName.py)**: Extracts gene names from dbSNP associated with rsIDs
+- **[linkStarToRSID.py](https://github.com/jakelever/pgxmine/blob/master/linkStarToRSID.py)**: Some rudimentary text mining to link star alleles with a specific rsID
+- **[prCurve.py](https://github.com/jakelever/pgxmine/blob/master/prCurve.py)**: Calculate PR curves for the classifiers
 
 ## Main scripts
 
-- **align.py**: Align PubTator Central entities against abstracts and full-text papers
-- **findPGxSentences.py**: Identify star alleles then find sentences that mention a chemical and variant
-- **createKB.py**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
-- **filterAndCollate.py**: Filter the results to reduce false positives and collate the associations
+- **[align.py](https://github.com/jakelever/pgxmine/blob/master/align.py)**: Align PubTator Central entities against abstracts and full-text papers
+- **[findPGxSentences.py](https://github.com/jakelever/pgxmine/blob/master/findPGxSentences.py)**: Identify star alleles then find sentences that mention a chemical and variant
+- **[createKB.py](https://github.com/jakelever/pgxmine/blob/master/createKB.py)**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
+- **[filterAndCollate.py](https://github.com/jakelever/pgxmine/blob/master/filterAndCollate.py)**: Filter the results to reduce false positives and collate the associations
 
 # Paper
 
