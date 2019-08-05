@@ -8,8 +8,6 @@ if __name__ == '__main__':
 	parser.add_argument('--outFile',required=True,type=str,help='Output file')
 	args = parser.parse_args()
 
-	#regex = re.compile("GENEINFO=[^;]*")
-
 	wanted = []
 	with open(args.pubtator) as inF:
 		for line in inF:
@@ -29,11 +27,6 @@ if __name__ == '__main__':
 				continue
 
 			details = split[7]
-
-			#match = re.search(regex,details)
-			#if match:
-			#	geneInfo = match.group().split('=')[1]
-			#	outF.write("%s\t%s\n" % (rsid, geneInfo))
 
 			geneInfos = [ d for d in details.split(';') if d.startswith('GENEINFO') ]
 			if geneInfos:

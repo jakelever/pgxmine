@@ -45,11 +45,6 @@ if __name__ == '__main__':
 				if 'PharmGKB' in chem:
 					meshIDsToPharmGKB[meshID] = chem['PharmGKB']
 					
-				
-		#chemMeshIDs = set([ 'MESH:'+d['MeSH'] for d in chemData ])
-		#meshIDsToChemName = { ('MESH:'+d['MeSH']):d['name'] for d in chemData }
-		#meshIDsToPharmGKB = { ('MESH:'+d['MeSH']):d['PharmGKB'] for d in chemData if 'PharmGKB' in d }
-		#meshIDsToDrugBank = { ('MESH:'+d['MeSH']):d['DrugBank'] for d in chemData }
 
 	dbsnp = {}
 	with open(args.dbsnp) as f:
@@ -180,8 +175,6 @@ if __name__ == '__main__':
 
 					score = scores[key]
 
-					#chemicalVariants = [ cv for _,cv in sorted ( [ (cv.position[0],cv) for cv in chemicalVariants ] ) ]
-
 					# Sort by location in sentence
 					chemicalVariants = sorted(chemicalVariants, key = lambda x: x.position[0] )
 
@@ -191,7 +184,6 @@ if __name__ == '__main__':
 					chemical,variant = chemicals[0],variants[0]
 
 					chemical_text = chemical.text
-					#chemicalID,chemicalNormalized = chemicals[chemicalText.lower()][0]
 					chemical_mesh_id = chemical.metadata['conceptid']
 					chemical_pharmgkb_id = meshIDsToPharmGKB[chemical_mesh_id] if chemical_mesh_id in meshIDsToPharmGKB else 'NA'
 					chemical_normalized = meshIDsToChemName[chemical_mesh_id]

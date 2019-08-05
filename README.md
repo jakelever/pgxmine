@@ -95,6 +95,7 @@ Here is a summary of the main script files. The pubrunner.yml file is the master
 - **[findPGxSentences.py](https://github.com/jakelever/pgxmine/blob/master/findPGxSentences.py)**: Identify star alleles then find sentences that mention a chemical and variant
 - **[createKB.py](https://github.com/jakelever/pgxmine/blob/master/createKB.py)**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
 - **[filterAndCollate.py](https://github.com/jakelever/pgxmine/blob/master/filterAndCollate.py)**: Filter the results to reduce false positives and collate the associations
+- **[utils/__init__.py](https://github.com/jakelever/pgxmine/blob/master/utils/__init__.py)**: Big functions for variant normalization and outputting the formatted sentences
 
 # Paper
 

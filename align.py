@@ -27,9 +27,6 @@ if __name__ == '__main__':
 	parser.add_argument('--outBioc',required=True,type=str,help='Output BioC file')
 	args = parser.parse_args()
 
-	#with open(args.annotations,'rb') as f:
-	#	annotations = pickle.load(f)
-
 	pmids = set()
 
 	with bioc.iterparse(args.inBioc) as parser:
@@ -37,17 +34,11 @@ if __name__ == '__main__':
 			if 'pmid' in doc.infons and doc.infons['pmid'] != 'None':
 				pmid = int(doc.infons['pmid'])
 				pmids.add(pmid)
-			
-				#thisDocLength = sum( len(passage.text) for passage in doc.passages )
-
-
 	
-			#writer.writedocument(doc)
 	pmidToAnnotations = defaultdict(list)
 	with open(args.annotations) as f:
 		for line in f:
 			split = line.strip('\n').split('\t')
-			#if split[4] == 'GNormPlus' and split[1] == 'Gene':
 			pmid,annotationType,conceptid,mentions,database = split
 			mentions = mentions.strip()
 			pmid = int(pmid)
@@ -66,7 +57,6 @@ if __name__ == '__main__':
 
 			if 'pmid' in doc.infons and doc.infons['pmid'] != 'None':
 				pmid = int(doc.infons['pmid'])
-				#pmcid = int(doc.infons['pmcid'])
 
 				print(now(),i,pmid)
 				sys.stdout.flush()
