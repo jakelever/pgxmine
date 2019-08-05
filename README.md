@@ -1,5 +1,14 @@
 # PGxMine
 
+<p>
+<a href="http://bionlp.bcgsc.ca/pgxmine/">
+   <img src="https://img.shields.io/badge/data-viewer-9e42f4.svg" />
+</a>
+<a href="https://doi.org/10.5281/zenodo.3360930">
+   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3360931.svg" />
+</a>
+</p>
+
 This is the codebase for the PGxMine project to using text-mining to identify papers for curation into [PharmGKB](https://www.pharmgkb.org). It is a Python3 project that makes use of the [Kindred](https://github.com/jakelever/kindred) relation classifier along with the [PubRunner](https://github.com/jakelever/pubrunner) project to run tools across PubMed and accessible PubMed Central.
 
 # Viewing the Data
