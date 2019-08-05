@@ -2,9 +2,13 @@
 
 This is the codebase for the PGxMine project to using text-mining to identify papers for curation into PharmGKB. It is a Python3 project that makes use of the Kindred relation classifier along with the PubRunner project to run tools across PubMed and accessible PubMed Central.
 
+# Viewing the Data
+
+The data can be viewed through the [Shiny app](http://bionlp.bcgsc.ca/pgxmine/).
+
 # Software Dependencies
 
-This project dependends on Kindred, scispacy and PubRunner. They can be installed as below:
+This project depends on Kindred, scispacy and PubRunner. They can be installed as below:
 
 ```
 pip install kindred pubrunner scispacy
@@ -20,7 +24,7 @@ This project uses a variety of data sources. The downloadPubtatorCentralAndMeSH.
 - PubMed and accessible PubMed Central (downloaded by PubRunner)
 - PubTator Central
 - MeSH (only needed to update the drug list)
-- DrugBank (download manually as account is required and name it full_database.xml)
+- DrugBank (download manually as account is required and name it full\_database.xml)
 - PharmGKB (used for constructing the drug list and comparisons)
 
 The following commands prepare the needed data (after you have downloaded the DrugBank XML file manually).
@@ -38,11 +42,55 @@ python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugban
 
 # Example Run
 
+There is an example input file in the example directory which contains a couple PubMed abstracts in BioC format. The run\_example.sh script does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv.
+
+```
+# Align the PubTator Central extracted entities against the text sources to get offset positions for chemicals, variants
+python align.py --inBioc example/input.bioc.xml --annotations <(zcat data/bioconcepts2pubtatorcentral.gz) --outBioc example/aligned.bioc.xml
+
+# Parse and find sentences that mention a chemical, variant and likely a pharmacogenomic assocation (using filter terms)
+python findPGxSentences.py --inBioc example/aligned.bioc.xml --filterTermsFile pgx_filter_terms.txt --outBioc example/sentences.bioc.xml
+
+# Train relation classifiers (using the annotations* files as training data), filter for specific chemicals and apply the classifiers to extract associations and output with normalized genes, variants and chemicals
+python createKB.py --trainingFiles annotations.variant_star_rs.bioc.xml,annotations.variant_other.bioc.xml --inBioC example/sentences.bioc.xml --selectedChemicals selected_chemicals.json --dbsnp dbsnp_selected.tsv --variantStopwords stopword_variants.txt --genes gene_names.tsv  --outKB example/kb.tsv
+
+# Collate the output of createKB (which in a full run would be ~1800 files) and filter using the relation probability and collated by counting number of papers
+python filterAndCollate.py --inData example --outUnfiltered example/mini_unfiltered.tsv --outCollated example/mini_collated.tsv --outSentences example/mini_sentences.tsv
+```
+
 # Full Run
 
-# Viewer
+To do a full run, you would need to use PubRunner. It would then manage the download and format conversion of PubMed, PubMed Central Open Access subset and PubMed Central Author Manuscript Collection. The command to do it is below
+
+```
+pubrunner .
+```
+
+This will take a long time. Setting up PubRunner with a cluster is recommended. A test run is below.
+
+```
+pubrunner --test .
+```
+
+# Script Overview
+
+Here is a summary of the main script files. The pubrunner.yml file is the master script for PubRunner and lists the resources and script usage to actually run the project.
+
+## Setup scripts
+
+- **createDrugList.py**: Creates the list of drugs and drug mappings from MeSH IDs to PharmGKB IDs with some filtering by categories
+- **linkRSIDToGeneName.py**: Extracts gene names from dbSNP associated with rsIDs
+- **linkStarToRSID.py**: Some rudimentary text mining to link star alleles with a specific rsID
+- **prCurve.py**: Calculate PR curves for the classifiers
+
+## Main scripts
+
+- **align.py**: Align PubTator Central entities against abstracts and full-text papers
+- **findPGxSentences.py**: Identify star alleles then find sentences that mention a chemical and variant
+- **createKB.py**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
+- **filterAndCollate.py**: Filter the results to reduce false positives and collate the associations
 
 # Supplementary Materials
 
-In the FILE, there are additional details of methods that didn't fit into the paper.
+Supplementary materials for the manuscript are found in supplementary\_materials.md.
 
