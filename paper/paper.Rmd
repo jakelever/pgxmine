@@ -1,0 +1,186 @@
+---
+title: "PGxMine: Text mining for curation of PharmGKB"
+#output: 
+#  bookdown::pdf_document2
+#  html_document: 
+#    fig_caption: yes
+#params:
+#   region: east
+#editor_options: 
+#  chunk_output_type: console
+site: bookdown::bookdown_site
+documentclass: book
+output:
+#  bookdown::html_document2
+  bookdown::word_document2
+#  bookdown::pdf_document2
+bibliography: pgmine.bibtex
+csl: world-neurosurgery.csl
+---
+
+
+```{r pgxmineSetup, include=FALSE}
+source('dependencies.R')
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r pgxmineFigures, echo=F}
+pdf(file="sideeffects.pdf")
+source('figures.R')
+source('pharmgkb_comparison.R')
+invisible(dev.off())
+```
+
+TODO: Authors
+
+## Abstract
+
+Precision medicine tailors treatment to individuals personal data including differences in their genome. The Pharmacogenomics Knowledgebase (PharmGKB) provides highly curated information on the effect of genetic variation on drug response and side effects for a wide range of drugs. PharmGKB’s scientific curators triage, review and annotate a large number of papers each year but the task is challenging. We present the PGxMine resource, a text-mined resource of pharmacogenomic associations from all accessible published literature to assist in curation of PharmGKB. We developed a supervised machine learning pipeline to extract associations between a variant (DNA and protein changes, star alleles and dbSNP identifiers) and a chemical. PGxMine covers `r paper.chemicalCount` chemicals and `r paper.variantCount` variants and contains `r paper.mentionCount` mentions of pharmacogenomic associations across `r paper.pmidCount` papers. An evaluation by PharmGKB curators found that 57 of the top 100 associations not found in PharmGKB led to 83 curatable papers and a further 24 associations would likely lead to curatable papers through citations. The results can be viewed at https://pgxmine.pharmgkb.org/ and data can be downloaded at LINK.
+
+## Introduction
+
+Precision medicine has been described as getting patients "the right drug at the right dose at the right time" [@hamburg2010path]. It has been shown that genetics can play a large part in whether the drug and dose are right for that particular patient and numerous diagnostic tests have been developed to test for genetic variants related to drug efficacy [@relling2015pharmacogenomics]. These pharmacogenomic variants encompass germline variants or somatic variants in cancer. They may affect the direct target of a drug, potentially by disrupting binding pockets, (e.g. T790M for many EGFR inhibitors [@zhou2009novel]), the metabolizing enzymes that may affect drug concentrations, by affecting enzyme efficiency (e.g. the cytochrome P450 family of enzymes [@tornio2018cytochrome]), or drug transporters that may affect the disposition of the drugs and influence efficacy and toxicity.  Response to several drugs is now known to be affected greatly by individual genetic diversity. For example, the dosing of the blood-thinner warfarin is known to be influenced by variation in CYP2C9 and VKORC1 genes [@johnson2011clinical].
+
+Cataloging this expanding knowledge of pharmacogenomic variants is the goal of the PharmGKB. Launched in 2000 [@whirl2012pharmacogenomics], it collects, curates and disseminates knowledge about gene-drug associations, many of which are clinically actionable,   and provides resources for both researchers and clinicians. A group of expert curators searches the scientific literature for relevant pharmacogenomic papers and add their findings to the knowledge base. However, managing the curation of a biomedical knowledge base is a very challenging task. As precision medicine efforts increase and the cost of sequencing decreases, more genetic biomarkers will be found that might prove to be clinically actionable. It is already a huge challenge to identify relevant papers and these technological developments will inevitably lead to an increase in the number of published papers and an increased burden on the PharmGKB curators.
+
+Machine learning methods are used to assist in biomedical knowledge base curation in two different ways. A document-level approach attempts to identify documents that would be appropriate for curation into the knowledge base using word frequencies, metadata, and other factors. This approach was taken for the ORegAnno database [@aerts2008text], Gene Expression Database [@jiang2019effective] and for mouse genomics [@dowell2009integrating]. A mention-level approach attempts to extract the main associations that would be curated in the knowledge base and aggregating them to identify missing knowledge linked to curatable papers. The CIViCmine approach extracted mentions of clinically relevant cancer variants to identify the most frequently discussed that should be curated into the CIViC database [@lever2018text]. This method is linked with automated knowledge base construction methods which have been used in part to construct the STRING database of protein interactions [@szklarczyk2014string] and the CancerMine database of cancer genes [@lever2019cancermine] directly from published literature.
+
+In order to extract pharmacogenomic variants associated with specific chemicals, we propose to use a biomedical relation extraction method. The field of biomedical relation extraction focuses on extracting mentions of particular relations between entities (e.g. genes, drugs, variants, etc) in unstructured text. Dependency-parse based methods have seen great success in this area [@lever2017painless] while deep learning methods achieve similar performance but face issues with overfitting [@mehryary2016deep]. Relation extraction relies on first identifying mentions of specific entities, e.g. chemicals and variants, using entity extraction tools such as BANNER [@leaman2008banner] and tmVar [@wei2017tmvar]. The Pubtator resource has provided PubMed abstracts annotated with chemicals, diseases, genes, species, and variants [@wei2013pubtator]. Numerous projects have built on top of the annotations provided by PubTator [@percha2018global,@mahmood2016dimex]. Recently, the Pubtator Central (PTC) resource expanded this to open-access Pubmed Central full-text articles [@wei2019pubtator].
+
+In this paper, we present PGxMine, a text-mined resource of pharmacogenomic associations between chemicals and variants. We build upon the PubTator Central resource and use a text-alignment method to extract specific mentions of chemicals, genes, and variants in the text. We further identify star alleles that are particularly important/unique and frequently appears in pharmacogenomic literature (e.g. CYP2D6\*2) in text. We parse and extract sentences that mention a chemical and variant and filter to enrich for sentences that likely discuss pharmacogenomic associations. We build classifiers to extract pharmacogenomic associations and apply these to all sentences accessible from PubMed abstracts and PubMed Central full-text papers. These results are then presented to the PharmGKB team to assist in their curation efforts.
+
+
+```{r pipeline, echo=F, eval=T, fig.width=10, fig.asp=0.4,  fig.cap='(ref:pipeline)'}
+knitr::include_graphics("fig_pipeline.png")
+```
+
+(ref:pipeline) An overview of the full PGxMine system. The input data sources on the left (PubMed, etc) and PubTator Central are combined through a text alignment process to identify mentions of specific biological entities in published literature. Star Alleles (e.g. CYP2D6\*2) are then found using the gene annotations. Sentences are then filtered using keywords to enrich for pharmacogenomic topics. A Kindred supervised classifier is then trained and applied to identify specific variant/chemical associations. These are then filtered for high probability matches and collated to produce the three output files on the right.
+
+
+## Methods
+
+Figure \@ref(fig:pipeline) shows an overview of the approach that takes in PubTator Central entities and abstracts/articles and outputs collated sets of pharmacogenomic associations between variants and chemicals relevant to the PharmGKB project.
+
+### Resources
+
+We downloaded the 26th June 2019 release of the Pubtator Central data which contains PubMed IDs associated with text mentions of chemicals, variants, genes, and other entities. The chemicals are mapped to MeSH terms, the genes are mapped to Entrez Gene IDs and where possible, the variants are mapped to dbSNP IDs (also known as rs IDs). We used the PubRunner infrastructure to download abstracts from PubMed and full-text papers from the PubMed Open Access (PMCOA) subset and PubMed Central Author Manuscript Collection (PMCAMC) and convert to BioC format [@comeau2013bioc].
+
+To map chemicals in PubTator Central to the identifiers used in PharmGKB, we used DrugBank [@wishart2017drugbank]. We filtered the drug list by several categories in DrugBank to remove biological molecules that were not relevant drugs (details in Supplementary Materials). We also removed short terms (shorter than 4 characters). Variants were filtered using a custom set of exclusion words to remove common terms that appear to be variants but are not, e.g. for common cell-line names.
+
+### Text alignment
+
+```{r alignment, echo=F, eval=T, fig.width=10, fig.asp=0.4,  fig.cap='(ref:alignment)'}
+knitr::include_graphics("fig_alignment.png")
+```
+
+(ref:alignment) Data from PubMed Central (PTC) is shown in the table and contains five columns for the PubMed ID, entity type, normalized ID, mention and tool used for extraction. The alignment of this example data is shown to text from the corresponding paper.
+
+
+Unlike PubTator, PubTator Central does not provide the specific offsets of each biomedical entity within the text of the abstract or full paper. It provides the substring of the mention along with the PubMed ID. We used this information to align the PTC substrings to the corresponding text in the abstract or full-text paper wherever appropriate as shown in Figure \@ref(fig:alignment). The alignment algorithm takes each text mention and creates a regular expression to search the corresponding article text. Each regular expression starts and ends with word-boundaries so that matches wouldn’t happen inside words. We replaced each section of whitespace with a “\\s+” regular expression to map to any length of whitespace. PTC appears to translate the papers from Unicode to ASCII and provides ASCII mentions. Several important entities contain Unicode characters, e.g. TGF-α. so we replaced ASCII Greek letters (e.g. alpha) with a regex to map to either the ASCII text or the Greek character. These regular expressions then find candidate mappings for each text. We process the mappings largest to smallest so that no entity is mapped inside a larger entity. This tool produced the final document in the BioC format with annotations for the corresponding aligned entities with normalized IDs from PubTator Central.
+
+### Finding Star Alleles
+
+Star alleles denote a named haplotype of a gene, which may include one or more specific variants. They are normally numbered such that the second star allele for CYP2D6 is denoted CYP2D6\*2. Suballeles also exist such as CYP2A6\*4A. To extract these, we used the gene annotations from the aligned PubTator Central documents. We built a regular expression that searched immediately after gene mentions to identify instances of an asterisk followed by a word beginning with a digit (including colons to capture HLA alleles). We allowed for additional star alleles separated by white space, forward slashes, commas, and the words “and” and “or”. The normalized version of the variant is the name of the gene concatenated with the star-allele with whitespace removed. Furthermore we normalized the name of the allele specifically for the HLA family of genes. Specifically, we remove whitespace, leading zeros, and colons and then reinsert colons in character doubles. For example, HLA-B\*05701 goes to HLA-B\*57:01.
+
+### Filtering and Renormalizing Variants
+
+PubTator Central uses the tmVar 2 tool for extracting variant mentions. It can extract DNA-level mutations (e.g. c.93G>A), protein-level mutations (e.g. T790M) and dbSNP IDs (e.g. rs12979860). Where possible, tmVar 2 will map the DNA/protein variants back to a dbSNP ID using co-mentions of genes in the document to filter down candidate matches. Hence a mention of EGFR alongside T790M provides enough context to map it to rs121434569. We are primarily interested in those that can be mapped back to dbSNP IDs but kept all variant mentions as long as they contained a specific coordinate (i.e. filtering out cases such as c.G>A). For variants that are successfully mapped to a dbSNP ID by tmVar 2, PTC does not provide the normalized text form of the variant. For example, ‘an EGFR threonine-to-methionine mutation at residue 790’ is mapped successfully to rs121434569 but we also need the HGVS normalized form, p.T790M. We implemented a re-normalization stage using regular expressions to capture the variant types output by tmVar 2.
+
+### Identifying Sentences of Interest
+
+We extract all sentences that mention at least one variant (including star alleles) and one chemical from our filtered list. In an initial trial of this system focussing only on mentions of specific dbSNP IDs, we found that sentences were highly likely to mention pharmacogenomic events. However, when all variants are included, sentences are much less likely to discuss a pharmacogenomic association. Any machine learning system would then have a large challenge with such an imbalanced problem. We, therefore, filter with a customized set of keywords (in Supplementary Materials) that increase the likelihood of a pharmacogenomic association or for a mention of a specific dbSNP ID.
+
+### Relation Classifier
+
+The previous steps provide a large set of co-occurrences between variants and chemicals. But many of them are not describing a pharmacogenomic association. For instance, some of the sentences are very long and the chemical and variant are discussed in different contexts. Therefore we build relation classifiers to identify the pharmacogenomic relations. 
+
+Due to a class balance difference, we split the dataset into two. The first set is all potential chemical/variant where the variant is a specific RS ID or a star allele. The second set is all remaining chemical/variant associations which contain variants for specific DNA or protein changes. We worked on the two sets separately because, empirically, the first set has a higher likelihood for discussing pharmacogenomic associations. For each set, we annotated 500 sentences for pharmacogenomic associations. Chemical/variant associations were annotated as pharmacogenomic if the variant is discussed as physically interacting with the chemical, as affecting the metabolism, concentration or resistance of the chemical, as causing adverse events related to the chemical, as related to addiction to the chemical, or is part of a clinical test for that chemical use. The PharmGKB curators are also interested in variants found to be negatively associated pharmacogenomically with a chemical, so we also annotated negative discoveries as positive sentences in our data set. In total, we had 1000 annotated sentences which for evaluation are split into 80%/20% training and test sets. 
+
+We then created two relation classifiers, one for each for the two sets. We used a logistic regression as the classifier using Kindred’s default set of dependency-path based features. The logistic regression provides a thresholdable output score to control the precision-recall tradeoff. As in previous work, we used a high-precision/low-recall classifier [@lever2019cancermine]. We created precision-recall curves to evaluate the trade-off and select a threshold of 0.75 for both classifiers. We filtered out cancer-associated chemicals (using DrugBank categories) that are associated with a protein/DNA variant as they are likely somatic events which are outside the focus of the PharmGKB resource.
+
+### Application to the entire literature
+
+We then used the PubRunner infrastructure to apply these two classifiers across all the aligned sentences [@anekalla2017pubrunner]. This enabled the use of a compute cluster to quickly classify sentences as to whether they contain pharmacogenomic information. We then outputted relations along with the normalized form of the chemical and genes with other metadata. The gene information was included for star alleles and for variants normalized to dbSNP if it could be extracted from dbSNP. Metadata from the source paper is also included such as PubMed ID, title, journal, publication year and section within the paper. We also provide a version of the sentence which has HTML characters escaped and the entities in the relation highlighted with basic HTML tags for easy viewing. This output is the unfiltered version available.
+
+We filtered relations that were scored lower than the previously selected threshold of 0.75 to reduce the false positive rate to create the pgmine_filtered.tsv file. Finally, we collated the results by variant, chemical and where applicable gene IDs to find the total number of papers that discuss each variant/chemical association. This provides a rough metric of the importance of each association and allows a ranking to see which frequently discussed associations should be curated into PharmGKB. This collated version is released as the pgmine_collated.tsv file.
+
+### Mapping to PharmGKB
+
+We mapped the PGxMine set of associations to those found in PharmGKB. PharmGKB already contains some mappings directly to MeSH IDs but these needed to be supplemented with additional mappings from other sources. DrugBank provides a mapping from the MeSH ID used by PubTator Central to PharmGKB chemical IDs. Variants that have been mapped to dbSNPs or are star alleles can be mapped directly into PharmGKB. PharmGKB contains compound associations where multiple chemicals are associated with a variant. For simplicity, we unfold these associations so that all associations are from one chemical to one variant, allowing matching against the PGxMine data. For this comparison, we remove suballeles from star alleles (e.g. CYP3A5\*3A -> CYP3A5\*3). We also build a mapping for star alleles that map directly to a single RS ID to check if either is found in PharmGKB (e.g. POR\*28 maps to rs1057868). Further details of this mapping are explained in the Supplementary Materials. For each PGxMine association, we then check if the variant has been seen in PharmGKB, the chemical has been seen in PharmGKB and whether this particular association has been seen.
+
+### Viewer
+
+```{r viewer,  echo=F, eval=T, fig.width=10, fig.asp=1,  fig.cap='(ref:viewer)'}
+knitr::include_graphics("fig_viewer.png")
+```
+
+(ref:viewer) The data can be viewed through an R Shiny application in a web browser which allows the user to sort and filter the data and explore specific sentences that mention the association. The main table shows chemical/variant associations with gene information where possible. This table can be filtered using controls to the left to select specific chemicals, variants or genes. It can also be filtered for whether elements are already curated into PharmGKB. By selecting a row in the top table, a further table below (not shown) is populated with sentences that mention the selected association along with paper metadata.
+
+The filtered and collated versions are then viewed through a viewer built using the R Shiny framework. We host a publicly accessible version at URL. This viewer (shown in Figure \@ref(fig:viewer)) shows the collated chemical-variant associations sorted in descending order by the number of papers that mention them.  These results can then be filtered by a chemical, variant or gene, whether this data exists in PharmGKB and the type of variant, e.g. star allele. There are also Download buttons to facilitate downloading only a subset of the data. When a row in the top table is selected, a lower table is populated with all the sentences that discuss that particular association. Metadata is provided for the source of the sentence with links to the original paper.
+
+## Results
+
+### Performance of Classifiers
+
+
+```{r prcurves, echo=F, eval=T, fig.width=6, fig.asp=1,  fig.cap='(ref:prcurves)'}
+grid.arrange(fig_prcurves)
+```
+
+(ref:prcurves) The precision-recall curves (above) and the same statistics shown against the threshold parameter for the classifier (below) for the two classifiers.
+
+Using an 80%/20% training and test split, we evaluate the two classifiers independently. Figure \@ref(fig:prcurves) shows precision-recall curve plots of the three classifiers. The black line shows the selected high threshold (0.75) that provides higher precision (`r paper.precision1`% and `r paper.precision2`% for the two classifiers) with the tradeoff of lower recall (`r paper.recall1`% and `r paper.recall2`%). 
+
+### Knowledge Base Results
+
+By applying the two classifiers we identify `r paper.mentionCount` mentions of pharmacogenomic associations in `r paper.sentenceCount` sentences across `r paper.pmidCount` papers. `r paper.titleOrAbstract`% of these associations are in the title or abstract. When collated, we find a total of `r paper.associationCount` unique gene/variant associations. Of all the variant mentions, `r paper.normalizedToRSID`% can be normalized to a rsID and `r paper.starAlleles`% are star alleles. 
+
+As would be expected, there is a long-tail of associations with `r paper.singlePapers`% of the unique associations being discussed in only a single paper. These singletons are of interest to the PharmGKB curators as the aim to improve coverage for rarer and less frequently discussed associations. We also find that the associations are found across all subsections of papers, even including the author contributions section.
+
+
+```{r variantChemicalJournals, echo=F, eval=T, fig.width=10, fig.asp=.5,  fig.cap='(ref:variantChemicalJournals)'}
+grid.arrange(fig_variantChemicalJournals)
+```
+
+(ref:variantChemicalJournals) The 10 most common chemicals, variants and source journals by the number of extracted associations.
+
+Figure \@ref(fig:variantChemicalJournals) illustrates the most common chemicals in extracted chemical/variant associations as well as the most common variants with their gene names. Warfarin is the most frequently discussed drug in pharmacogenomic research and many of variants in the CYP family appear in the top ten variants. It also shows the most frequent journal sources that mentions are extracted from. Unsurprisingly, PLOS ONE is the most common source given the high number of papers that published there and also that they provide full-text articles.
+
+Notably, a substantial number of the variants that cannot be normalized to a human gene appear to be HIV specific variants that appear in the virus genome and not the human genome. While these do affect drug resistance, they are outside the scope of PharmGKB but could be useful information for HIV researchers.
+
+### Comparison to PharmGKB
+
+
+```{r comparison, echo=F, eval=T, fig.width=10, fig.asp=0.4,  fig.cap='(ref:comparison)'}
+grid.arrange(fig_comparison)
+```
+
+(ref:comparison) Venn Diagrams for the overlap in associations between PharmGKB and the PGxMine resource and papers identified in both resources.
+
+We compare the associations extracted from the literature with the contents of the PharmGKB database. Figure \@ref(fig:comparison) shows the overlap of associations and specific papers. The scale of the PharmGKB database cannot be understated and this figure illustrates the vast number of associations that have already been manually curated. `r paper.pharmGKBPercentageOverlap`% of associations found in PGxMine have previously been curated into PharmGKB but `r paper.associationsNotInPharmGKB` could be curatable associations. As we identify mentions of associations, many of which will be in papers discussing previous work and not a new result, we wouldn't expect to see a large overlap in the articles in PGxMine and PharmGKB. Nevertheless, we do see a sizeable overlap of papers based on PubMed IDs suggesting that PGxMine does often directly identify the appropriate paper for curation.
+
+### Utility for Curators
+
+The goal of PGxMine is to lead the PharmGKB curators to new papers that should be curated. To evaluate this, the PharmGKB curators reviewed a subset of the top chemical/variant associations. The top 100 associations that were not in PharmGKB and did not appear in a previously curated paper were provided to the PharmGKB curators. They evaluated each association with the sentences and metadata provided by PGxMine. They judged whether the associated papers were appropriate for curation into PharmGKB or whether the discovered papers likely led to curatable papers. Of the 100 associations, 57 led directly to at least one curatable paper. A further 24 associations likely led to curatable papers through citations in the papers discovered by PGxMine.
+
+Of the 57 that led directly to curatable papers, 37 led to a single curatable paper, 16 led to two curatable papers, 3 led to three papers and one association (Donepezil with CYP2D6 rs1080985) led to five papers for curation. In total, the 100 associations examined led directly to 83 curatable papers and likely 24+ other papers that could be found through examining citations of the PGxMine extracted papers.
+
+The curators made use of the sentence metadata that identifies the section of the paper and found that associations mentioned in the Results section were more likely to be in curatable papers. Associations in the Introduction section were more likely to lead to valuable papers through citations and that specific paper would not be curatable. The curators normally focus on a smaller set of journals that publish pharmacogenomic studies. These results identified several papers in journals outside this group and show that PGxMine is a valuable tool to survey the broader biomedical literature without putting further burden on the PharmGKB curators.
+
+
+## Discussion
+
+Our results suggest that PGxmine will assist PharmGKB curators but there are several notable limitations. The results of PGxMine rely entirely on the results of PubTator Central. We have explored running the individual NER tools on the large corpus ourselves but the computational cost, in terms of time and memory usage, is immense. Updates to our resource will, therefore, depend on the update frequency of PubTator Central which we hope to be frequent. This reliance of PGxMine on PubTator Central also means that we inherit any limitations of the NER tools used. While the NER tools are state-of-the-art for the entities that they are extracting, mistakes will still be made. We attempted to clean up issues by requiring longer terms and filtering out certain drug categories.
+
+PGxMine is also limited to associations found within the same sentence. This is a problem that all current information extraction systems face as the false positive rate explodes for systems that attempt to extract relations across sentences [@lever2016verse]. This is a ripe area for further research and an annotated coreference dataset may push forward performance in this area in the future.
+
+The tradeoff of recall and precision is a challenging one for many machine learning problems. Curators become frustrated with a system that has too many false positives and are understanding of a system that does not have 100% coverage of associations. We, therefore, target high-precision low-recall for this problem, especially when the frequently discussed associations are found in hundreds of papers, meaning that they will likely be discovered by our pipeline. For example, the most frequently extracted association is `r paper.topAssoc_chemical` with `r paper.topAssoc_variant` in `r paper.topAssoc_paperCount` papers. This means we should capture frequently discussed associations that aren't yet curated into PharmGKB. We find that the vast majority of extracted associations (`r paper.singlePapers`%) are only mentioned in one paper. While more frequently discussed associations are of greater interest to PharmGKB, these singletons provide a valuable trove for further curation.
+
+Another challenge is capturing diplotypes of alleles or more complicated haplotype arrangements. While these are rare, they provide useful information for curators. We are also planning to investigate providing a feedback mechanism for curators so that they can flag issues with the information extraction pipeline. This will require an approach that allows the curators to provide for nuanced feedback for the machine learning system to guide and improve its relevance.
+
+## Conclusions
+
+We have presented PGxMine, a knowledge base of pharmacogenomic associations to support curation of PharmGKB database. We developed a method for extracting knowledge from the new PubTator Central resource using a text alignment system coupled with a method for identifying star alleles and proven relation extraction methods. Our results can be updated regularly as PubTator Central is updated. We make the code and supplementary materials available with an MIT license (https://github.com/jakelever/pgxmine) and data available under CC0 license (TODO: INSERT Zenodo URL) with the understanding that all data is extracted automatically and has not been vetted by the PharmGKB curation team.
+
+## References
