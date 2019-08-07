@@ -91,13 +91,6 @@ pubrunner --test .
 
 Here is a summary of the main script files. The pubrunner.yml file is the master script for PubRunner and lists the resources and script usage to actually run the project.
 
-## Setup scripts
-
-- **[createDrugList.py](https://github.com/jakelever/pgxmine/blob/master/createDrugList.py)**: Creates the list of drugs and drug mappings from MeSH IDs to PharmGKB IDs with some filtering by categories
-- **[linkRSIDToGeneName.py](https://github.com/jakelever/pgxmine/blob/master/linkRSIDToGeneName.py)**: Extracts gene names from dbSNP associated with rsIDs
-- **[linkStarToRSID.py](https://github.com/jakelever/pgxmine/blob/master/linkStarToRSID.py)**: Some rudimentary text mining to link star alleles with a specific rsID
-- **[prCurve.py](https://github.com/jakelever/pgxmine/blob/master/prCurve.py)**: Calculate PR curves for the classifiers
-
 ## Main scripts
 
 - **[align.py](https://github.com/jakelever/pgxmine/blob/master/align.py)**: Align PubTator Central entities against abstracts and full-text papers
@@ -105,6 +98,14 @@ Here is a summary of the main script files. The pubrunner.yml file is the master
 - **[createKB.py](https://github.com/jakelever/pgxmine/blob/master/createKB.py)**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
 - **[filterAndCollate.py](https://github.com/jakelever/pgxmine/blob/master/filterAndCollate.py)**: Filter the results to reduce false positives and collate the associations
 - **[utils/__init__.py](https://github.com/jakelever/pgxmine/blob/master/utils/__init__.py)**: Big functions for variant normalization and outputting the formatted sentences
+
+## Other scripts
+
+- **[createDrugList.py](https://github.com/jakelever/pgxmine/blob/master/createDrugList.py)**: Creates the list of drugs and drug mappings from MeSH IDs to PharmGKB IDs with some filtering by categories
+- **[linkRSIDToGeneName.py](https://github.com/jakelever/pgxmine/blob/master/linkRSIDToGeneName.py)**: Extracts gene names from dbSNP associated with rsIDs
+- **[linkStarToRSID.py](https://github.com/jakelever/pgxmine/blob/master/linkStarToRSID.py)**: Some rudimentary text mining to link star alleles with a specific rsID
+- **[prepareForAnnotation.py](https://github.com/jakelever/pgxmine/blob/master/prepareForAnnotation.py)**: Select sentences and output to the standoff format to be annotated
+- **[prCurve.py](https://github.com/jakelever/pgxmine/blob/master/prCurve.py)**: Calculate PR curves for the classifiers
 
 # Paper
 
