@@ -143,7 +143,7 @@ associationTableExplanation <- "<br /><b>Association Table:</b><br />The table b
 
 paperSentenceTableExplanation <- "<br /><br /><br /><b>Sentence Table:</b><br />Select a chemical-variant association in the table above to see sentences and publication information<br /><br />"
 
-lastModifiedText = paste("PGmine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
+lastModifiedText = paste("PGxmine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
 
 
 
@@ -155,6 +155,7 @@ collated[,Chemical_ID_Variant:=NULL]
 ui <- function(req) {
   fluidPage(
     tags$head(
+      includeHTML("google-analytics.js"),
       tags$style(".rightAlign{float:right; margin-left:5px; margin-bottom: 20px;}")
     ),
     HTML('<script>
