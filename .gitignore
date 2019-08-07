@@ -20,3 +20,16 @@ selected_chemicals.json
 
 annotations.variant_other.bioc.xml
 annotations.variant_star_rs.bioc.xml
+
+.Rproj.user
+*.Rproj
+.RData
+.Rhistory
+
+pgxmine_collated.tsv
+pgxmine_sentences.tsv
+
+var_drug_ann.tsv
+var_fa_ann.tsv
+var_pheno_ann.tsv
+
