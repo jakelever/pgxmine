@@ -33,3 +33,7 @@ var_drug_ann.tsv
 var_fa_ann.tsv
 var_pheno_ann.tsv
 
+VennDiagram*
+/paper/_book/*
+_main*
+sideeffects.pdf
