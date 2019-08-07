@@ -125,15 +125,3 @@ paper.recall2 <- round(100*atThreshold2$recall,1)
 paper.avg_precision <- round((paper.precision1+paper.precision2)/2,1)
 paper.avg_recall <- round((paper.recall1+paper.recall2)/2,1)
 
-yearCounts <- plyr::count(sentences$year)
-#yearCounts <- yearCounts[order(yearCounts$freq,decreasing=T),]
-#yearCounts <- journalCounts[1:15,]
-#yearCounts$x <- factor(journalCounts$x, levels=as.character(journalCounts$x))
-xyplot(freq ~ x, 
-                     yearCounts, 
-                         col='black', 
-                         xlab='Journal', 
-                         ylab='# of Mentions',
-         horizontal=F,
-                         scales=list(x=list(rot=45)))
-grid.arrange(fig_journals)
