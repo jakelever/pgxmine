@@ -143,7 +143,7 @@ associationTableExplanation <- "<br /><b>Association Table:</b><br />The table b
 
 paperSentenceTableExplanation <- "<br /><br /><br /><b>Sentence Table:</b><br />Select a chemical-variant association in the table above to see sentences and publication information<br /><br />"
 
-lastModifiedText = paste("PGxmine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
+lastModifiedText = paste("PGxMine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
 
 
 
