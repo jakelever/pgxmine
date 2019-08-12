@@ -1,7 +1,7 @@
 # PGxMine
 
 <p>
-<a href="http://bionlp.bcgsc.ca/pgxmine/">
+<a href="https://pgxmine.pharmgkb.org/">
    <img src="https://img.shields.io/badge/data-viewer-9e42f4.svg" />
 </a>
 <a href="https://doi.org/10.5281/zenodo.3360930">
@@ -13,7 +13,7 @@ This is the codebase for the PGxMine project to using text-mining to identify pa
 
 # Viewing the Data
 
-The data can be viewed through the [Shiny app](http://bionlp.bcgsc.ca/pgxmine/). It can be downloaded as TSV files at [Zenodo](https://doi.org/10.5281/zenodo.3360930).
+The data can be viewed through the [Shiny app](https://pgxmine.pharmgkb.org/). It can be downloaded as TSV files at [Zenodo](https://doi.org/10.5281/zenodo.3360930).
 
 To run a local instance of the PGxmine viewer, the R Shiny code can be found in [shiny/](https://github.com/jakelever/pgxmine/tree/master/shiny) and installation instructions are found there too.
 
@@ -22,7 +22,7 @@ To run a local instance of the PGxmine viewer, the R Shiny code can be found in 
 This project depends on [Kindred](https://github.com/jakelever/kindred), [scispacy](https://allenai.github.io/scispacy/) and [PubRunner](https://github.com/jakelever/pubrunner). They can be installed as below:
 
 ```
-pip install kindred pubrunner scispacy
+pip install kindred pubrunner
 
 pip install scispacy
 pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.0/en_core_sci_sm-0.2.0.tar.gz
@@ -35,20 +35,23 @@ This project uses a variety of data sources. The [downloadDataDependencies.sh](h
 - [PubMed](https://www.nlm.nih.gov/databases/download/pubmed_medline.html) and accessible [PubMed Central](https://www.ncbi.nlm.nih.gov/pmc/tools/ftp/) (downloaded by PubRunner)
 - [PubTator Central](https://www.ncbi.nlm.nih.gov/research/pubtator/)
 - [MeSH](https://www.nlm.nih.gov/databases/download/mesh.html) (only needed to update the drug list)
-- [DrugBank](https://www.drugbank.ca/releases/latest) (download manually as account is required and name it full\_database.xml)
+- [DrugBank](https://www.drugbank.ca/releases/latest) (download manually as account is required and name it drugbank.xml)
 - [PharmGKB](https://www.pharmgkb.org/downloads) (used for constructing the drug list and comparisons)
 
-The following commands prepare the needed data (after you have downloaded the DrugBank XML file manually).
+The [prepareData.sh](https://github.com/jakelever/pgxmine/blob/master/prepareData.sh) script downloads some of the data dependencies and runs some preprocessing to extract necessary data (such as gene name mappings). The commands that it runs are detailed below.
 
 ```
-# Download PubTator Central, MeSH and dbSNP
+# Download PubTator Central, MeSH, dbSNP, Entrez Gene metadata and pharmGKB drug info
 sh downloadDataDependencies.sh
 
 # Extract the gene names associated with rsIDs from dbSNP
-python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.bgz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile gene_names.tsv
+python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.gz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile dbsnp_selected.tsv
 
 # Create the drug list with mappings from MeSH IDs to PharmGKB IDs (with some filtering using DrugBank categories)
-python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugbank full_database.xml --pharmgkb data/drugs.tsv --outFile selected_chemicals.json
+python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugbank drugbank.xml --pharmgkb data/drugs.tsv --outFile selected_chemicals.json
+
+# Extract a mapping from Entrez Gene ID to name
+zgrep -P "^9606\t" data/gene_info.gz | cut -f 2,3 -d $'\t' > gene_names.tsv
 
 # Unzip the annotated training data of pharmacogenomics relations
 gunzip -c annotations.variant_other.bioc.xml.gz > annotations.variant_other.bioc.xml

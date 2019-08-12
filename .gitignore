@@ -14,7 +14,7 @@ example/mini_collated.tsv
 example/mini_sentences.tsv
 
 dbsnp_selected.tsv
-full_database.xml
+drugbank.xml
 gene_names.tsv
 selected_chemicals.json
 
@@ -37,3 +37,5 @@ VennDiagram*
 /paper/_book/*
 _main*
 sideeffects.pdf
+
+slurm-*
