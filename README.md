@@ -30,7 +30,7 @@ pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.0/e
 
 # Data Dependencies
 
-This project uses a variety of data sources. The [downloadDataDependencies.sh](https://github.com/jakelever/pgxmine/blob/master/downloadDataDependencies.sh) script will download two and PubRunner will manage the others, apart from DrugBank which needs to be download manually.
+This project uses a variety of data sources. A few need to be downloaded as below and PubRunner will manage the others, apart from DrugBank which needs to be download manually.
 
 - [PubMed](https://www.nlm.nih.gov/databases/download/pubmed_medline.html) and accessible [PubMed Central](https://www.ncbi.nlm.nih.gov/pmc/tools/ftp/) (downloaded by PubRunner)
 - [PubTator Central](https://www.ncbi.nlm.nih.gov/research/pubtator/)
