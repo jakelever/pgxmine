@@ -48,3 +48,12 @@ In order to show gene names, rsIDs were mapped to them using dbSNP. The [linkRSI
 
 Some star alleles contain only a single mutation and are represented by an rsID (e.g. POR\*28 to rs1057868). Most star alleles are more complex haplotypes of a series of mutations in a genes. No mapping exists for all star alleles, though some exist for some gene familes (e.g. PharmVar). The [linkStarToRSID.py](https://github.com/jakelever/pgxmine/blob/master/linkStarToRSID.py) script does a regular expression search of the biomedical literature to find occurrences of star alleles right next to an rsID, e.g. "We study POR\*28 (rs1057868)" with the rsID in brackets. We then manually filtered this list to produce starRSMappings.tsv.
 
+## Annotated data sets
+
+We annotated two sets of 500 sentences for relations between drugs and variants. The first 500 sentence set was "Star Alleles & RS IDs" that contain sentences with star alleles (e.g. CYP2C19\*2) or specific dbSNP RS IDs (e.g. rs9923231) and has a higher likelihood of containing pharmacogenomic information. The second 500 sentence set was "DNA & Protein Modifications" and contains sentences which mention specific DNA (e.g. c.521T>C) or protein modifications (e.g. p.C3435T). It had a lower class balance. The table below shows the number of relations in the two sets as associated or not associated.
+
+| Relation Type                      | Star Alleles & RS IDs | DNA & Protein Modifications |
+|------------------------------------|-----------------------|-----------------------------|
+| Pharmacogenomically associated     | 412                   | 206                         |
+| Not Pharmacogenomically associated | 201                   | 472                         |
+
