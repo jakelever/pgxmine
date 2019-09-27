@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
 	pmids = set()
 
-	with bioc.iterparse(args.inBioc) as parser:
+	with bioc.BioCXMLDocumentReader(args.inBioc) as parser:
 		for i,doc in enumerate(parser):
 			if 'pmid' in doc.infons and doc.infons['pmid'] != 'None':
 				pmid = int(doc.infons['pmid'])
@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
 
 	currentID = 1
-	writer = bioc.iterwrite(args.outBioc)
-	with bioc.iterparse(args.inBioc) as parser:
+	writer = bioc.BioCXMLDocumentWriter(args.outBioc)
+	with bioc.BioCXMLDocumentReader(args.inBioc) as parser:
 		for i,doc in enumerate(parser):
 			for passage in doc.passages:
 				passage.annotations = []
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 							a.locations.append(bioc.BioCLocation(offset=start, length=(end-start)))
 							passage.annotations.append(a)
 
-			writer.writedocument(doc)
+			writer.write_document(doc)
 
 	print ('Done!')
 
