@@ -57,3 +57,4 @@ We annotated two sets of 500 sentences for relations between drugs and variants.
 | Pharmacogenomically associated     | 412                   | 206                         |
 | Not Pharmacogenomically associated | 201                   | 472                         |
 
+The datasets are available in this repo in the two archives: [annotations.variant_star_rs.bioc.xml.gz](https://github.com/jakelever/pgxmine/blob/master/annotations.variant_star_rs.bioc.xml.gz) and [variant_other.bioc.xml.gz](https://github.com/jakelever/pgxmine/blob/master/annotations.variant_other.bioc.xml.gz)
