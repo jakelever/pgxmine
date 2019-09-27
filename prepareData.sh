@@ -1,4 +1,13 @@
 #!/bin/bash
+#
+#SBATCH --job-name=pubtator_test
+#
+#SBATCH --time=96:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=24576
+#SBATCH --qos long
+
 set -e
 
 if [ ! -f drugbank.xml ]; then
@@ -18,7 +27,7 @@ python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.gz) --pubtator
 python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugbank drugbank.xml --pharmgkb data/drugs.tsv --outFile selected_chemicals.json
 
 # Extract a mapping from Entrez Gene ID to name
-zgrep -P "^9606\t" data/gene_info.gz | cut -f 2,3 -d $'\t' > gene_names.tsv
+zgrep -P "^9606\t" data/gene_info.gz | cut -f 2,3,10 -d $'\t' > gene_names.tsv
 
 # Unzip the annotated training data of pharmacogenomics relations
 gunzip -c annotations.variant_other.bioc.xml.gz > annotations.variant_other.bioc.xml
