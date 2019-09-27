@@ -64,3 +64,5 @@ The datasets are available in this repo in the two archives: [annotations.varian
 The figure below shows the sections of the full-text papers from which the mentions are extracted. All sections are covered with the discussion sections being the more common area for discovery. The section headers are extracted by PubRunner using a custom list of section headings and then grouped into the categories shown in the figure.
 
 ![barchart showing subsections of paper](https://raw.githubusercontent.com/jakelever/pgxmine/master/subsection_plot.svg?sanitize=true)
+
+**Figure S1**
