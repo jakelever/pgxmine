@@ -65,4 +65,4 @@ The figure below shows the sections of the full-text papers from which the menti
 
 ![barchart showing subsections of paper](https://raw.githubusercontent.com/jakelever/pgxmine/master/subsection_plot.svg?sanitize=true)
 
-**Figure S1**
+**Figure S1**. Number of mentions of pharmacogenomic associations extracted from each subsection of full-text papers.
