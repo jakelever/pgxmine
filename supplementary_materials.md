@@ -58,3 +58,9 @@ We annotated two sets of 500 sentences for relations between drugs and variants.
 | Not Pharmacogenomically associated | 201                   | 472                         |
 
 The datasets are available in this repo in the two archives: [annotations.variant_star_rs.bioc.xml.gz](https://github.com/jakelever/pgxmine/blob/master/annotations.variant_star_rs.bioc.xml.gz) and [variant_other.bioc.xml.gz](https://github.com/jakelever/pgxmine/blob/master/annotations.variant_other.bioc.xml.gz)
+
+## Subsections
+
+The figure below shows the sections of the full-text papers from which the mentions are extracted. All sections are covered with the discussion sections being the more common area for discovery. The section headers are extracted by PubRunner using a custom list of section headings and then grouped into the categories shown in the figure.
+
+![barchart showing subsections of paper](https://raw.githubusercontent.com/jakelever/pgxmine/master/subsection_plot.svg?sanitize=true)
