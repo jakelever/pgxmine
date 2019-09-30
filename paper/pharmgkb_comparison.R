@@ -110,12 +110,14 @@ pharmGKB$Chemical_ID
 notInPGMine_id <- pharmGKB$Chemical_ID[!(pharmGKB$Chemical_ID %in% collated$chemical_pharmgkb_id)]
 notInPGMine <- sort(unique(pharmGKB[pharmGKB$Chemical_ID %in% notInPGMine_id,'Chemical_Name']))
 
+#pmids_PMCAMC <- as.integer(scan("pmids/PMCAMC.txt", character(), quote = ""))
+#pmids_PMCOA <- as.integer(scan("pmids/PMCOA.txt", character(), quote = ""))
+#pmids_fulltext <- unique(c(pmids_PMCAMC,pmids_PMCOA))
+#paper.pharmgkbPaperHasFullText <- prettyNum(sum(pharmGKB_pmids %in% pmids_fulltext),big.mark=',')
+#paper.pharmgkbPaperNum <- prettyNum(length(pharmGKB_pmids),big.mark=',')
+#paper.pharmgkbPaperHasFullTextPerc <- round(100*sum(pharmGKB_pmids %in% pmids_fulltext)/length(pharmGKB_pmids),1)
 
-pmids_PMCAMC <- as.integer(scan("pmids/PMCAMC.txt", character(), quote = ""))
-pmids_PMCOA <- as.integer(scan("pmids/PMCOA.txt", character(), quote = ""))
-
-pmids_fulltext <- unique(c(pmids_PMCAMC,pmids_PMCOA))
-
-paper.pharmgkbPaperHasFullText <- prettyNum(sum(pharmGKB_pmids %in% pmids_fulltext),big.mark=',')
-paper.pharmgkbPaperNum <- prettyNum(length(pharmGKB_pmids),big.mark=',')
-paper.pharmgkbPaperHasFullTextPerc <- round(100*sum(pharmGKB_pmids %in% pmids_fulltext)/length(pharmGKB_pmids),1)
+# Hard-coded as PMID data files are too big for GitHub
+paper.pharmgkbPaperHasFullText <- "796"
+paper.pharmgkbPaperNum <- "6,489"
+paper.pharmgkbPaperHasFullTextPerc <- "12.3"
