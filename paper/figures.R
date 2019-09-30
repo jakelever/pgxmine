@@ -125,3 +125,8 @@ paper.recall2 <- round(100*atThreshold2$recall,1)
 paper.avg_precision <- round((paper.precision1+paper.precision2)/2,1)
 paper.avg_recall <- round((paper.recall1+paper.recall2)/2,1)
 
+inTitle <- sum(sentences$section=='title')
+inAbstract <- sum(sentences$section=='abstract')
+
+paper.mentionsInFullText <- prettyNum(nrow(sentences) - inTitle - inAbstract,big.mark=',')
+paper.mentionsInFullTextPerc <- round(100*(nrow(sentences) - inTitle - inAbstract)/nrow(sentences),1)

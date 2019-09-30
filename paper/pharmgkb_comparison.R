@@ -4,12 +4,15 @@ pharmGKBFilenames <- c('var_drug_ann.tsv','var_fa_ann.tsv','var_pheno_ann.tsv')
 pharmGKB <- as.data.table(matrix(nrow=0,ncol=2))
 pharmGKB_pmids <- c()
 colnames(pharmGKB) <- c('Variant','Chemical')
-pharmGKB_modifiedDates <- c()
+pharmGKB_modifiedDate <- "0000-00-00"
 for (pharmGKBFilename in pharmGKBFilenames) {
   pharmGKBFilename <- normalizePath(pharmGKBFilename)
   fileInfo <- file.info(pharmGKBFilename)
   tmpPharmGKB_modifiedDate <- strsplit(as.character(fileInfo$mtime), ' ')[[1]][1]
-  pharmGKB_modifiedDates <- c(pharmGKB_modifiedDates,tmpPharmGKB_modifiedDate)
+  if (tmpPharmGKB_modifiedDate > pharmGKB_modifiedDate) {
+    pharmGKB_modifiedDate <- tmpPharmGKB_modifiedDate
+    paper.pharmgkbDate <- format(as.Date(fileInfo$mtime), format="%d %B %Y")
+  }
   
   tempPharmGKB <- fread(pharmGKBFilename,sep='\t',header=T,stringsAsFactors=T,quote='')
   pharmGKB_pmids <- c(pharmGKB_pmids,tempPharmGKB$PMID)
@@ -18,9 +21,6 @@ for (pharmGKBFilename in pharmGKBFilenames) {
   pharmGKB <- rbind(pharmGKB,tempPharmGKB)
 }
 pharmGKB_pmids <- unique(sort(pharmGKB_pmids))
-
-# Get the most recent modified date of the PharmGKB files loaded
-pharmGKB_modifiedDate <- sort(pharmGKB_modifiedDates,decreasing=T)[1]
 
 #pharmGKB <- pharmGKB[grep(",",pharmGKB$Chemical,fixed=TRUE),]
 pharmGKB$Chemical <- gsub('"','',pharmGKB$Chemical)
@@ -69,14 +69,14 @@ starAlleles <- grep("*",collated$variant_id,fixed=T)
 collated$Chemical_ID_Variant[starAlleles] <- gsub("[A-Z]$","",collated$Chemical_ID_Variant[starAlleles])
 
 pharmGKBAssociations <- unique(pharmGKB$Chemical_ID_Variant)
-pgMineAssociations <- unique(collated$Chemical_ID_Variant)
+pgxMineAssociations <- unique(collated$Chemical_ID_Variant)
 pharmGKBAssociations <- pharmGKBAssociations[pharmGKBAssociations!='']
-pgMineAssociations <- pgMineAssociations[pharmGKBAssociations!='']
+pgxMineAssociations <- pgxMineAssociations[pharmGKBAssociations!='']
 pharmGKBAssociations <- pharmGKBAssociations[!is.na(pharmGKBAssociations)]
-pgMineAssociations <- pgMineAssociations[!is.na(pgMineAssociations)]
+pgxMineAssociations <- pgxMineAssociations[!is.na(pgxMineAssociations)]
 
 associatonComparison <- venn.diagram(
-  x = list(PharmGKB=pharmGKBAssociations , PGmine=pgMineAssociations ),
+  x = list(PharmGKB=pharmGKBAssociations , PGxMine=pgxMineAssociations ),
   scaled=T,
   fill = c("grey", "white"),
   cat.fontface = 2,
@@ -85,13 +85,13 @@ associatonComparison <- venn.diagram(
 associationComparisonPlot <- gTree(children=associatonComparison)
 associationComparisonPlot <- grid.arrange(associationComparisonPlot,bottom='Chemical/Variant Associations')
 
-paper.pharmGKBPercentageOverlap <- round(100*sum(pgMineAssociations %in% pharmGKBAssociations) / length(pgMineAssociations),1)
-paper.associationsNotInPharmGKB <- prettyNum(length(pgMineAssociations) - sum(pgMineAssociations %in% pharmGKBAssociations),big.mark=',')
+paper.pharmGKBPercentageOverlap <- round(100*sum(pgxMineAssociations %in% pharmGKBAssociations) / length(pgxMineAssociations),1)
+paper.associationsNotInPharmGKB <- prettyNum(length(pgxMineAssociations) - sum(pgxMineAssociations %in% pharmGKBAssociations),big.mark=',')
 
 pgxmine_PMIDs <- unique(sentences$pmid)
 
 pmidComparisonPlot <- venn.diagram(
-  x = list(PharmGKB=pharmGKB_pmids , PGmine=pgxmine_PMIDs ),
+  x = list(PharmGKB=pharmGKB_pmids , PGxMine=pgxmine_PMIDs ),
   scaled=T,
   fill = c("grey", "white"),
   cat.fontface = 2,
@@ -109,3 +109,13 @@ pharmGKB$Chemical_ID
 
 notInPGMine_id <- pharmGKB$Chemical_ID[!(pharmGKB$Chemical_ID %in% collated$chemical_pharmgkb_id)]
 notInPGMine <- sort(unique(pharmGKB[pharmGKB$Chemical_ID %in% notInPGMine_id,'Chemical_Name']))
+
+
+pmids_PMCAMC <- as.integer(scan("pmids/PMCAMC.txt", character(), quote = ""))
+pmids_PMCOA <- as.integer(scan("pmids/PMCOA.txt", character(), quote = ""))
+
+pmids_fulltext <- unique(c(pmids_PMCAMC,pmids_PMCOA))
+
+paper.pharmgkbPaperHasFullText <- prettyNum(sum(pharmGKB_pmids %in% pmids_fulltext),big.mark=',')
+paper.pharmgkbPaperNum <- prettyNum(length(pharmGKB_pmids),big.mark=',')
+paper.pharmgkbPaperHasFullTextPerc <- round(100*sum(pharmGKB_pmids %in% pmids_fulltext)/length(pharmGKB_pmids),1)
