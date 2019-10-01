@@ -60,7 +60,7 @@ journalPlot <- barchart(freq ~ x,
                          ylab='# of Extracted Associations',
                          scales=list(x=list(rot=45)))
 
-fig_variantChemicalJournals <- arrangeGrob(variantPlot,chemicalPlot,journalPlot,nrow=1)
+fig_variantChemicalJournals <- arrangeGrob(chemicalPlot,variantPlot,journalPlot,nrow=1)
 grid.arrange(fig_variantChemicalJournals)
 
 prCurve_other <- read.table('prcurve.variant_other.tsv',header=T)
@@ -112,7 +112,7 @@ prcurvesPlot <- xyplot(precision ~ recall | source,
        col='black',
        type='l')
 
-fig_prcurves <- arrangeGrob(prcurvesPlot,thresholdPlot,ncol=1)
+fig_prcurves <- arrangeGrob(prcurvesPlot,thresholdPlot,ncol=2)
 grid.arrange(fig_prcurves)
 
 atThreshold1 = prCurve[prCurve$source=='DNA & Protein Modifications' & prCurve$threshold==.75,]
