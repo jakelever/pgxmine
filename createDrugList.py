@@ -1,7 +1,6 @@
 import argparse
 import xml.etree.cElementTree as etree
 import re
-import SPARQLWrapper
 import codecs
 import six
 from collections import defaultdict
@@ -149,7 +148,6 @@ if __name__ == '__main__':
 				exclude = True
 
 			if exclude and not nameLower in allowed:
-				print("EXCLUDED\t%s\t%s" % (drugbankID,name))
 				elem.clear()
 				continue
 
@@ -191,7 +189,7 @@ if __name__ == '__main__':
 	for pharmGKBID,hasMesh in pharmGKB_hasMesh.items():
 		if not hasMesh:
 			name = pharmGKB_id2Name[pharmGKBID]
-			print("No MESH: %s (%s)" % (name, pharmGKBID))
+			#print("No MESH: %s (%s)" % (name, pharmGKBID))
 
 
 	with open(args.outFile,'w') as outF:

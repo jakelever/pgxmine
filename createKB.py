@@ -60,10 +60,13 @@ if __name__ == '__main__':
 		variantStopwords = set( line.strip().lower() for line in f )
 
 	geneID2Name = {}
+	proteinCodingGenes = set()
 	with open(args.genes) as f:
 		for line in f:
-			entrezID,name = line.strip('\n').split('\t')
+			entrezID,name,geneType = line.strip('\n').split('\t')
 			geneID2Name[entrezID] = name
+			if geneType == 'protein-coding':
+				proteinCodingGenes.add(entrezID)
 
 	print("Loaded chemical, gene and variant data")
 
@@ -216,7 +219,14 @@ if __name__ == '__main__':
 						if variant_id in dbsnp:
 							gene_names,gene_ids = dbsnp[variant_id]
 
+							proteinCoding = [ (gene_id,gene_name) for gene_id,gene_name in zip(gene_ids,gene_names) if gene_id in proteinCodingGenes ]
+							if len(proteinCoding) > 0:
+								# Only include the protein coding if there are any
+								gene_ids = [ gene_id for gene_id,gene_name in proteinCoding ]
+								gene_names = [ gene_name for gene_id,gene_name in proteinCoding ]
+
 							genes = [ e for e in doc.entities if e.entityType == 'Gene' and e.metadata['conceptid'] in gene_ids ]
+
 							gene_names = ",".join(gene_names)
 							gene_ids = ",".join(gene_ids)
 
