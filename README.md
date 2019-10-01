@@ -116,5 +116,5 @@ The paper can be recompiled using the dataset using Bookdown. All text and code 
 
 # Supplementary Materials
 
-Supplementary materials for the manuscript are found in [supplementary\_materials.md](https://github.com/jakelever/pgxmine/blob/master/supplementaryMaterials/).
+Supplementary materials for the manuscript are found in [supplementaryMaterials/](https://github.com/jakelever/pgxmine/blob/master/supplementaryMaterials/).
 
