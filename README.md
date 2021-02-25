@@ -9,7 +9,7 @@
 </a>
 </p>
 
-This is the codebase for the PGxMine project to using text-mining to identify papers for curation into [PharmGKB](https://www.pharmgkb.org). It is a Python3 project that makes use of the [Kindred](https://github.com/jakelever/kindred) relation classifier along with the [PubRunner](https://github.com/jakelever/pubrunner) project to run tools across PubMed and accessible PubMed Central.
+This is the codebase for the PGxMine project that uses text-mining to identify papers for curation into [PharmGKB](https://www.pharmgkb.org). It is a Python3 project that makes use of the [Kindred](https://github.com/jakelever/kindred) relation classifier along with the [PubRunner](https://github.com/jakelever/pubrunner) project to run tools across PubMed and accessible PubMed Central.
 
 # Viewing the Data
 
