@@ -13,21 +13,13 @@ example/mini_unfiltered.tsv
 example/mini_collated.tsv
 example/mini_sentences.tsv
 
-dbsnp_selected.tsv
-drugbank.xml
-gene_names.tsv
-selected_chemicals.json
-
-annotations.variant_other.bioc.xml
-annotations.variant_star_rs.bioc.xml
-
 .Rproj.user
 *.Rproj
 .RData
 .Rhistory
 
-pgxmine_collated.tsv
-pgxmine_sentences.tsv
+working/
+test_working/
 
 var_drug_ann.tsv
 var_fa_ann.tsv
