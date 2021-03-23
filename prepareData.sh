@@ -10,30 +10,12 @@
 
 set -e
 
-dummyDrugbank="<emptydrugbank></emptydrugbank>"
-
-if [[ "$@" == "--useDummyDrugbank" ]]; then
-	# For testing without DrugBank. Do not use for full run
-	dummyDrugbankMD5=`echo "$dummyDrugbank" | md5sum`
-	existingDrugbankMD5=`cat drugbank.xml | md5sum`
-	if [ -f drugbank.xml && [ "$dummyDrugbankMD5" != "$existingDrugbankMD5" ] ]; then
-		echo "ERROR: Drugbank.xml exists and contains non-dummy data. Cannot overwrite it with --useDummyDrugbank"
-		exit 1
-	fi
-	echo "$dummyDrugbank" > drugbank.xml
-elif [ ! -f drugbank.xml ]; then
+if [ ! -f drugbank.xml ]; then
 	echo "ERROR: Couldn't find file drugbank.xml. Please download the latest version from https://www.drugbank.ca/releases and rename to drugbank.xml"
 	exit 1
 fi
 
-dummyDrugbankMD5=`echo "$dummyDrugbank" | md5sum`
-existingDrugbankMD5=`cat drugbank.xml | md5sum`
-if [[ "$dummyDrugbankMD5" == "$existingDrugbankMD5" ]]; then
-	echo "WARNING: Using a dummy version of DrugBank. You must download the actual DrugBank and save to drugbank.xml for full functionality"
-fi
-
 set -x
-exit 0
 
 # Download MeSH, dbSNP, Entrez Gene metadata and pharmGKB drug info
 sh downloadDataDependencies.sh
