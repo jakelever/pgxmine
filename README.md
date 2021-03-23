@@ -9,7 +9,7 @@
 </a>
 </p>
 
-This is the codebase for the PGxMine project that uses text-mining to identify papers for curation into [PharmGKB](https://www.pharmgkb.org). It is a Python3 project that makes use of the [Kindred](https://github.com/jakelever/kindred) relation classifier along with the [PubRunner](https://github.com/jakelever/pubrunner) project to run tools across PubMed and accessible PubMed Central.
+This is the codebase for the PGxMine project that uses text-mining to identify papers for curation into [PharmGKB](https://www.pharmgkb.org). It is a Python3 project that makes use of the [Kindred](https://github.com/jakelever/kindred) relation classifier along with the [BioText](https://github.com/jakelever/biotext) project to manage the download of PubMed/PMC and alignment with [PubTator](https://www.ncbi.nlm.nih.gov/research/pubtator/).
 
 # Viewing the Data
 
@@ -19,21 +19,19 @@ To run a local instance of the PGxmine viewer, the R Shiny code can be found in 
 
 # Software Dependencies
 
-This project depends on [Kindred](https://github.com/jakelever/kindred), [scispacy](https://allenai.github.io/scispacy/) and [PubRunner](https://github.com/jakelever/pubrunner). They can be installed as below:
+This project depends on [Kindred](https://github.com/jakelever/kindred), [scispacy](https://allenai.github.io/scispacy/). They can be installed by:
 
 ```
-pip install kindred pubrunner
-
-pip install scispacy
-pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.0/en_core_sci_sm-0.2.0.tar.gz
+pip install -r requirements.txt
 ```
 
 # Data Dependencies
 
-This project uses a variety of data sources. A few need to be downloaded as below and PubRunner will manage the others, apart from DrugBank which needs to be download manually.
+This project uses a variety of data sources. 
 
-- [PubMed](https://www.nlm.nih.gov/databases/download/pubmed_medline.html) and accessible [PubMed Central](https://www.ncbi.nlm.nih.gov/pmc/tools/ftp/) (downloaded by PubRunner)
-- [PubTator Central](https://www.ncbi.nlm.nih.gov/research/pubtator/)
+
+A few need to be downloaded as below, apart from DrugBank which needs to be download manually.
+
 - [MeSH](https://www.nlm.nih.gov/databases/download/mesh.html) (only needed to update the drug list)
 - [DrugBank](https://www.drugbank.ca/releases/latest) (download manually as account is required and name it drugbank.xml)
 - [PharmGKB](https://www.pharmgkb.org/downloads) (used for constructing the drug list and comparisons)
@@ -41,7 +39,7 @@ This project uses a variety of data sources. A few need to be downloaded as belo
 The [prepareData.sh](https://github.com/jakelever/pgxmine/blob/master/prepareData.sh) script downloads some of the data dependencies and runs some preprocessing to extract necessary data (such as gene name mappings). The commands that it runs are detailed below.
 
 ```
-# Download PubTator Central, MeSH, dbSNP, Entrez Gene metadata and pharmGKB drug info
+# Download MeSH, dbSNP, Entrez Gene metadata and pharmGKB drug info
 sh downloadDataDependencies.sh
 
 # Extract the gene names associated with rsIDs from dbSNP
@@ -63,9 +61,6 @@ gunzip -c annotations.variant_star_rs.bioc.xml.gz > annotations.variant_star_rs.
 There is an example input file in the example directory which contains a couple PubMed abstracts in BioC format. The run\_example.sh script does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv.
 
 ```
-# Align the PubTator Central extracted entities against the text sources to get offset positions for chemicals, variants
-python align.py --inBioc example/input.bioc.xml --annotations <(zcat data/bioconcepts2pubtatorcentral.gz) --outBioc example/aligned.bioc.xml
-
 # Parse and find sentences that mention a chemical, variant and likely a pharmacogenomic assocation (using filter terms)
 python findPGxSentences.py --inBioc example/aligned.bioc.xml --filterTermsFile pgx_filter_terms.txt --outBioc example/sentences.bioc.xml
 
@@ -96,7 +91,6 @@ Here is a summary of the main script files. The pubrunner.yml file is the master
 
 ## Main scripts
 
-- **[align.py](https://github.com/jakelever/pgxmine/blob/master/align.py)**: Align PubTator Central entities against abstracts and full-text papers
 - **[findPGxSentences.py](https://github.com/jakelever/pgxmine/blob/master/findPGxSentences.py)**: Identify star alleles then find sentences that mention a chemical and variant
 - **[createKB.py](https://github.com/jakelever/pgxmine/blob/master/createKB.py)**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
 - **[filterAndCollate.py](https://github.com/jakelever/pgxmine/blob/master/filterAndCollate.py)**: Filter the results to reduce false positives and collate the associations
