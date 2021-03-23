@@ -19,7 +19,7 @@ To run a local instance of the PGxmine viewer, the R Shiny code can be found in 
 
 # Software Dependencies
 
-This project depends on [Kindred](https://github.com/jakelever/kindred), [scispacy](https://allenai.github.io/scispacy/). They can be installed by:
+This project depends on [Kindred](https://github.com/jakelever/kindred), [scispacy](https://allenai.github.io/scispacy/) and [snakemake](https://snakemake.github.io/). They can be installed by:
 
 ```
 pip install -r requirements.txt
