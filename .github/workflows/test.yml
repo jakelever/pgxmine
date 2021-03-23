@@ -22,5 +22,5 @@ jobs:
         sh prepareDataForTesting.sh
     - name: Run the Snake pipeline on a couple test documents
       run: |
-        MODE=test snakefile --cores 1
+        MODE=test snakemake --cores 1
 
