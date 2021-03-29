@@ -94,3 +94,5 @@ if __name__ == '__main__':
 
 	kindred.save(sentenceCorpus,'biocxml',args.outBioc)
 
+	print("Found %d candidate sentences" % len(sentenceCorpus.documents))
+
