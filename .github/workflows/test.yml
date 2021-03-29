@@ -20,7 +20,7 @@ jobs:
     - name: Prepare some dummy drug/gene metadata (instead of loading very large files)
       run: |
         sh prepareDataForTesting.sh
-    - name: Run the Snake pipeline on a couple test documents
+    - name: Run the Snake pipeline on a test document
       run: |
         MODE=test snakemake --cores 1
 
