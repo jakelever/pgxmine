@@ -1,13 +1,4 @@
 #!/bin/bash
-#
-#SBATCH --job-name=pubtator_test
-#
-#SBATCH --time=96:00:00
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=24576
-#SBATCH --qos long
-
 set -ex
 
 echo "WARNING: Using miniature/empty drug and SNP metadata files for testing purposes. Don't use for main run!"
@@ -38,9 +29,9 @@ echo '[
 ]
 ' > data/selected_chemicals.json
 
-echo -e "54658\tUGT1A1\tprotein-coding" > data/gene_names.tsv
-echo -e "1576\tCYP3A4\tprotein-coding" >> data/gene_names.tsv
-echo -e "1577\tCYP3A5\tprotein-coding" >> data/gene_names.tsv
+echo "54658	UGT1A1	protein-coding" > data/gene_names.tsv
+echo "1576	CYP3A4	protein-coding" >> data/gene_names.tsv
+echo "1577	CYP3A5	protein-coding" >> data/gene_names.tsv
 
 # Unzip the annotated training data of pharmacogenomics relations
 gunzip -c annotations.variant_other.bioc.xml.gz > data/annotations.variant_other.bioc.xml
