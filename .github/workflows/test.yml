@@ -26,6 +26,6 @@ jobs:
     - name: Check that the output files have more than the header
       run: |
         test $(cat test_working/pgxmine_collated.tsv | wc -l) -gt 1
-        test $(cat test_working/pgxmine_sentences.tsv | wc -l) -gt 1
+        test $(cat test_working/pgxmine_sentences.tsv | wc -l) -gt 1000
         test $(cat test_working/pgxmine_unfiltered.tsv | wc -l) -gt 1
 
