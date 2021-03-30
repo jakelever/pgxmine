@@ -25,10 +25,22 @@ echo '[
 	  "D000077146"
 	],
 	"isCancerDrug": true
+},
+{
+	"PharmGKB": "PA451363",
+	"name": "Simvastatin",
+	"DrugBank": "DB00641",
+	"MeSH": [
+	  "D019821"
+	],
+	"isCancerDrug": false
 }
 ]
 ' > data/selected_chemicals.json
+
 echo -e "54658\tUGT1A1\tprotein-coding" > data/gene_names.tsv
+echo -e "1576\tCYP3A4\tprotein-coding" >> data/gene_names.tsv
+echo -e "1577\tCYP3A5\tprotein-coding" >> data/gene_names.tsv
 
 # Unzip the annotated training data of pharmacogenomics relations
 gunzip -c annotations.variant_other.bioc.xml.gz > data/annotations.variant_other.bioc.xml
