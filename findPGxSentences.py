@@ -89,6 +89,7 @@ if __name__ == '__main__':
 					sentenceStart = sentence.tokens[0].startPos
 					
 					sentenceEntities = [ kindred.Entity(e.entityType,e.text,[(e.position[0][0]-sentenceStart,e.position[0][1]-sentenceStart)],e.sourceEntityID,e.externalID,metadata=e.metadata) for e,_ in sentence.entityAnnotations ]
+					sentenceEntities = [ e for e in sentenceEntities if e.position[0][0] >= 0 and e.position[0][1] < len(sentence.text) ]
 					newDoc = kindred.Document(sentence.text,sentenceEntities,metadata=doc.metadata)
 					sentenceCorpus.addDocument(newDoc)
 
