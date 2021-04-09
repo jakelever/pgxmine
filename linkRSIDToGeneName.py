@@ -1,5 +1,6 @@
 import argparse
 import re
+import sys
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Extract mappings from rsID to genes')
@@ -16,6 +17,12 @@ if __name__ == '__main__':
 				wanted.append(split[2])
 	wanted = set(wanted)
 
+	assert len(wanted) > 0, "Didn't load any rsIDs from PubTator. Strange!"
+
+	print("Found %d SNPs in PubTator" % len(wanted))
+	sys.stdout.flush()
+
+	rsidCount = 0
 	with open(args.dbsnp) as inF, open(args.outFile,'w') as outF:
 		for line in inF:
 			if line[0] == '#':
@@ -32,5 +39,9 @@ if __name__ == '__main__':
 			if geneInfos:
 				geneInfo = geneInfos[0].split('=')[1]
 				outF.write("%s\t%s\n" % (rsid, geneInfo))
+				rsidCount += 1
 
+	assert rsidCount > 0, "Didn't find any matching rsIDs in dbSNP. Strange!"
+
+	print("Written %d rsID to gene name mappings" % rsidCount)
 

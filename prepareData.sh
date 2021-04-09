@@ -21,7 +21,7 @@ year=`date +"%Y"`
 sh downloadDataDependencies.sh
 
 # Extract the gene names associated with rsIDs from dbSNP
-python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.gz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile data/dbsnp_selected.tsv
+python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.*.gz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile data/dbsnp_selected.tsv
 
 # Create the drug list with mappings from MeSH IDs to PharmGKB IDs (with some filtering using DrugBank categories)
 python createDrugList.py --meshC data/c$year.bin --meshD data/d$year.bin --drugbank drugbank.xml --pharmgkb data/drugs.tsv --outFile data/selected_chemicals.json
