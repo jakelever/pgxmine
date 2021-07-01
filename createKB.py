@@ -165,8 +165,8 @@ if __name__ == '__main__':
 
 					if ';' in chemical_mesh_id:
 						continue
-					elif ';' in variant_concept_id:
-						continue
+					#elif ';' in variant_concept_id:
+					#	continue
 
 					key = (chemical_mesh_id,variant_concept_id)
 					groups[key].add(chemical)
@@ -212,10 +212,14 @@ if __name__ == '__main__':
 					if variant_normalized is None:
 						continue
 
+					variant_metadata = variant.metadata['conceptid'].split(';')
+					corresponding_rsids = [ x for x in variant_metadata if re.match(r'rs\d+',x) ]
+					corresponding_genes = [ x for x in variant_metadata if re.match(r'CorrespondingGene:(?P<id>\d+)',x) ]
+
 					variant_id = ''
 					genes,gene_names,gene_ids = [],'',''
-					if variant.metadata['conceptid'].startswith('rs'):
-						variant_id = variant.metadata['conceptid'].replace(' ','')
+					if len(corresponding_rsids) == 1:
+						variant_id = corresponding_rsids[0]
 						if variant_id in dbsnp:
 							gene_names,gene_ids = dbsnp[variant_id]
 
@@ -230,6 +234,12 @@ if __name__ == '__main__':
 							gene_names = ",".join(gene_names)
 							gene_ids = ",".join(gene_ids)
 
+					if len(corresponding_genes) == 1:
+						tmp_gene_id = corresponding_genes[0].split(':')[1]
+						if tmp_gene_id in geneID2Name:
+							gene_names = geneID2Name[tmp_gene_id]
+							gene_ids = tmp_gene_id
+
 					if variant_id in variantFixes:
 						variant_id = variantFixes[variant_id]
 
@@ -238,6 +248,10 @@ if __name__ == '__main__':
 
 					if variant_text.startswith('rs') and variant_text == variant_id:
 						variant_normalized = variant_id
+
+					# Skip variants that start with asterisks but don't have metadata for a star allele - likely a mistake
+					if variant_text.strip().startswith('*') and not 'associated_gene' in variant.metadata:
+						continue
 
 					variant_type = 'unclear'
 					if variant_normalized.startswith('*'):
@@ -285,7 +299,6 @@ if __name__ == '__main__':
 					# Remove some very frequent mismatches
 					if (chemical_normalized,variant_id) in obviousMistakes:
 						continue
-						
 
 					sentence = doc.text.replace('’',"'")
 					formatted_sentence = utils.getFormattedDoc(doc, chemicals + variants + genes)
