@@ -1,0 +1,12 @@
+{
+	"file_list": [
+		"working/pgxmine_collated.tsv",
+		"working/pgxmine_sentences.tsv",
+		"working/pgxmine_unfiltered.tsv"
+	],
+	"title": "PGxMine",
+	"author": "Jake Lever",
+	"author_affiliation": "University of Glasgow",
+	"description_file": "output_description.md",
+	"existing_zenodo_id": "3360930"
+}

@@ -39,21 +39,23 @@ A few need to be downloaded as below, apart from DrugBank which needs to be down
 The [prepareData.sh](https://github.com/jakelever/pgxmine/blob/master/prepareData.sh) script downloads some of the data dependencies and runs some preprocessing to extract necessary data (such as gene name mappings). The commands that it runs are detailed below.
 
 ```
+year=`date +"%Y"`
+
 # Download MeSH, dbSNP, Entrez Gene metadata and pharmGKB drug info
 sh downloadDataDependencies.sh
 
 # Extract the gene names associated with rsIDs from dbSNP
-python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.25.gz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile dbsnp_selected.tsv
+python linkRSIDToGeneName.py --dbsnp <(zcat data/GCF_000001405.*.gz) --pubtator <(zcat data/bioconcepts2pubtatorcentral.gz) --outFile data/dbsnp_selected.tsv
 
 # Create the drug list with mappings from MeSH IDs to PharmGKB IDs (with some filtering using DrugBank categories)
-python createDrugList.py --meshC data/c2019.bin --meshD data/d2019.bin --drugbank drugbank.xml --pharmgkb data/drugs.tsv --outFile selected_chemicals.json
+python createDrugList.py --meshC data/c$year.bin --meshD data/d$year.bin --drugbank drugbank.xml --pharmgkb data/drugs.tsv --outFile data/selected_chemicals.json
 
 # Extract a mapping from Entrez Gene ID to name
-zgrep -P "^9606\t" data/gene_info.gz | cut -f 2,3,10 -d $'\t' > gene_names.tsv
+zgrep -P "^9606\t" data/gene_info.gz | cut -f 2,3,10 -d $'\t' > data/gene_names.tsv
 
 # Unzip the annotated training data of pharmacogenomics relations
-gunzip -c annotations.variant_other.bioc.xml.gz > annotations.variant_other.bioc.xml
-gunzip -c annotations.variant_star_rs.bioc.xml.gz > annotations.variant_star_rs.bioc.xml
+gunzip -c annotations.variant_other.bioc.xml.gz > data/annotations.variant_other.bioc.xml
+gunzip -c annotations.variant_star_rs.bioc.xml.gz > data/annotations.variant_star_rs.bioc.xml
 ```
 
 # Example Run
@@ -71,23 +73,24 @@ python createKB.py --trainingFiles annotations.variant_star_rs.bioc.xml,annotati
 python filterAndCollate.py --inData example --outUnfiltered example/mini_unfiltered.tsv --outCollated example/mini_collated.tsv --outSentences example/mini_sentences.tsv
 ```
 
-# Full Run
+# Running with Snakemake
 
-To do a full run, you would need to use PubRunner. It would then manage the download and format conversion of PubMed, PubMed Central Open Access subset and PubMed Central Author Manuscript Collection. The command to do it is below
+To run a small example of the pipeline using snakemake, run the command below.
 
 ```
-pubrunner .
+MODE=test snakemake --cores 1
 ```
 
+To do a full run, you need to have set up a local instance of [BioText](https://github.com/jakelever/biotext) with the biocxml format. The command below will run Snakemake on the biotext. You must change BIOTEXT to point towards the biocxml directory in your local instance of BioText. This will take a while and it suggested to run with a cluster using snakemake's [cluster support](https://snakemake.readthedocs.io/en/stable/executing/cluster.html).
 This will take a long time. Setting up PubRunner with a cluster is recommended. A test run is below.
 
 ```
-pubrunner --test .
+MODE=full BIOTEXT=/path/to/biotext/biocxml snakemake --cores 1
 ```
 
 # Script Overview
 
-Here is a summary of the main script files. The pubrunner.yml file is the master script for PubRunner and lists the resources and script usage to actually run the project.
+Here is a summary of the main script files. The Snakefile manages the execution of these in the correct ordering.
 
 ## Main scripts
 
