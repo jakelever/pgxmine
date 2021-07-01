@@ -81,8 +81,7 @@ To run a small example of the pipeline using snakemake, run the command below.
 MODE=test snakemake --cores 1
 ```
 
-To do a full run, you need to have set up a local instance of [BioText](https://github.com/jakelever/biotext) with the biocxml format. The command below will run Snakemake on the biotext. You must change BIOTEXT to point towards the biocxml directory in your local instance of BioText. This will take a while and it suggested to run with a cluster using snakemake's [cluster support](https://snakemake.readthedocs.io/en/stable/executing/cluster.html).
-This will take a long time. Setting up PubRunner with a cluster is recommended. A test run is below.
+To do a full run, you need set up a local instance of [BioText](https://github.com/jakelever/biotext) with the biocxml format. The command below will run Snakemake on the biotext. You must change BIOTEXT to point towards the biocxml directory in your local instance of BioText. The run will take a while and a cluster is recommended using snakemake's [cluster support](https://snakemake.readthedocs.io/en/stable/executing/cluster.html).
 
 ```
 MODE=full BIOTEXT=/path/to/biotext/biocxml snakemake --cores 1
