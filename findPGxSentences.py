@@ -65,6 +65,11 @@ if __name__ == '__main__':
 	for corpus in kindred.iterLoad('biocxml',args.inBioc):
 		corpus = filterCorpus(corpus,filterTerms)
 
+		for doc in corpus.documents:
+			doc.text = doc.text.replace('\t',' ').replace('\n', ' ').replace('\r',' ')
+			for e in doc.entities:
+				e.text = e.text.replace('\t',' ').replace('\n', ' ').replace('\r',' ')
+
 		annotateStarAlleles(corpus)
 
 		corpusEntityTypes = [ set( e.entityType for e in doc.entities ) for doc in corpus.documents ]
