@@ -1,6 +1,4 @@
 
-import os
-
 localrules: final_files
 
 assert os.getenv('MODE') in ['full','test'], "Must set environmental variable MODE to full or test"
@@ -56,9 +54,11 @@ rule findPGxSentences:
 
 rule createKB:
 	input: 
-		file = '%s/sentences/{f}.bioc.xml' % work_dir
+		file = '%s/sentences/{f}.bioc.xml' % work_dir,
+		pediatric_pmids = '%s/pediatric_pmids.txt' % work_dir,
+		pregnant_pmids = '%s/pregnant_pmids.txt' % work_dir
 	output: '%s/kb/{f}.tsv' % work_dir,
-	shell: "python createKB.py --trainingFiles data/annotations.variant_star_rs.bioc.xml,data/annotations.variant_other.bioc.xml --inBioC {input.file} --selectedChemicals data/selected_chemicals.json --dbsnp data/dbsnp_selected.tsv --variantStopwords stopword_variants.txt --genes data/gene_names.tsv --outKB {output}"
+	shell: "python createKB.py --trainingFiles data/annotations.variant_star_rs.bioc.xml,data/annotations.variant_other.bioc.xml --inBioC {input.file} --selectedChemicals data/selected_chemicals.json --dbsnp data/dbsnp_selected.tsv --variantStopwords stopword_variants.txt --genes data/gene_names.tsv --pediatricPMIDs {input.pediatric_pmids} --outKB {output}"
    
 rule filterAndCollate:
 	input: kb_files,

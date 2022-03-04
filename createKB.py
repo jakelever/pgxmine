@@ -22,6 +22,7 @@ if __name__ == '__main__':
 	parser.add_argument('--dbsnp',required=True,type=str,help='File containing mappings from dbSNP IDs to genes')
 	parser.add_argument('--genes',required=True,type=str,help='File containing gene data')
 	parser.add_argument('--variantStopwords',required=True,type=str,help='Variants to remove')
+	parser.add_argument('--pediatricPMIDs',required=True,type=str,help='File with Pubmed IDs for all pediatric papers')
 	parser.add_argument('--inBioC',required=True,type=str,help='BioC file to predict things on')
 	parser.add_argument('--outKB',required=True,type=str,help='TSV file for KB')
 	args = parser.parse_args()
@@ -70,6 +71,10 @@ if __name__ == '__main__':
 
 	print("Loaded chemical, gene and variant data")
 
+	with open(args.pediatricPMIDs) as f:
+		pediatricPMIDs = set( int(line.strip()) for line in f )
+	print("Loaded pediatric PMIDs")
+
 	# Fix mapping of some popular variants to the correct SNP
 	variantFixes = {
 		'rs121913377':'rs113488022' # BRAF V600E
@@ -84,7 +89,7 @@ if __name__ == '__main__':
 	obviousMistakes = {('Abacavir','HLA-B*15:02'),('Allopurinol','HLA-B*15:02'),('Carbamazepine','HLA-B*57:01'),('Allopurinol','HLA-B*57:01'),('Carbamazepine','HLA-B*58:01'),('Abacavir','HLA-B*58:01')}
 	chemicalExclusions = {'cc and tc', 'cc+tc', 'cc + tc','whitehall ii','rvoto','lev-pae','oxaipn','luminal b','oxc-mpe','rapid stemi','vp40e'}
 
-	headers = ['pmid','title','journal','journal_short','year','month','day','section','subsection','chemical_mesh_id','chemical_pharmgkb_id','chemical_drugbank_id','chemical_text','chemical_normalized','chemical_position','variant_id','variant_type','variant_text','variant_normalized','variant_position','gene_ids','gene_names','score','sentence','formatted_sentence']
+	headers = ['pmid','title','journal','journal_short','year','month','day','is_pediatric_paper','section','subsection','chemical_mesh_id','chemical_pharmgkb_id','chemical_drugbank_id','chemical_text','chemical_normalized','chemical_position','variant_id','variant_type','variant_text','variant_normalized','variant_position','gene_ids','gene_names','score','sentence','formatted_sentence']
 	with open(args.outKB,'w') as outF:
 		outF.write("\t".join(headers) + "\n")
 
@@ -136,7 +141,12 @@ if __name__ == '__main__':
 				year = doc.metadata['year']
 				month = doc.metadata['month']
 				day = doc.metadata['day']
-				section = doc.metadata['section'] 
+				section = doc.metadata['section']
+
+				if pmid:
+					is_pediatric_paper = int(pmid) in pediatricPMIDs
+				else:
+					is_pediatric_paper = False
 
 				journal_short = journal
 				if len(journal_short) > 50:
@@ -165,8 +175,8 @@ if __name__ == '__main__':
 
 					if ';' in chemical_mesh_id:
 						continue
-					#elif ';' in variant_concept_id:
-					#	continue
+					elif ';' in variant_concept_id:
+						continue
 
 					key = (chemical_mesh_id,variant_concept_id)
 					groups[key].add(chemical)
@@ -303,7 +313,7 @@ if __name__ == '__main__':
 					sentence = doc.text.replace('’',"'")
 					formatted_sentence = utils.getFormattedDoc(doc, chemicals + variants + genes)
 
-					outData = [ pmid, title, journal, journal_short, year, month, day, section, subsection, chemical_mesh_id, chemical_pharmgkb_id, chemical_drugbank_id, chemical_text, chemical_normalized, chemical_position, variant_id, variant_type, variant_text, variant_normalized, variant_position, gene_ids, gene_names, score, sentence, formatted_sentence ]
+					outData = [ pmid, title, journal, journal_short, year, month, day, is_pediatric_paper, section, subsection, chemical_mesh_id, chemical_pharmgkb_id, chemical_drugbank_id, chemical_text, chemical_normalized, chemical_position, variant_id, variant_type, variant_text, variant_normalized, variant_position, gene_ids, gene_names, score, sentence, formatted_sentence ]
 
 					allowedUnicode = {'title','journal','journal_short','chemical_text','variant_text','sentence','formatted_sentence'}
 
