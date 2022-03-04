@@ -116,6 +116,7 @@ collatedNoNA <- is.na(collated$gene_names)
 s <- strsplit(as.character(collated$gene_names), split = ",")
 genesToMatchingID <- data.frame(matching_id = rep(collated$matching_id, sapply(s, length)), gene_name = unlist(s))
 genesToMatchingID$gene_name <- trimws(genesToMatchingID$gene_name)
+s <- NULL
 
 chemicals <- sort(unique(as.character(collated$chemical_normalized)))
 genes <- sort(unique(as.character(genesToMatchingID$gene_name)))
@@ -322,7 +323,7 @@ server <- function(input, output, session) {
   
   output$data_table <- DT::renderDataTable({
     table <- tableData()
-    DT::datatable(table[,c('chemical_normalized','gene_names','variant_id','variant_normalized','chemical_in_pharmgkb','variant_in_pharmgkb','association_in_pharmgkb','in_pharmgkb_paper','citation_count')],
+    DT::datatable(table[,c('chemical_normalized','gene_names','variant_id','variant_normalized','chemical_in_pharmgkb','variant_in_pharmgkb','association_in_pharmgkb','in_pharmgkb_paper','paper_count')],
                   selection = 'single',
                   rownames = FALSE,
                   colnames=c('Chemical','Gene(s)','Variant ID','Variant', 'Chemical in PharmGKB', 'Variant in PharmGKB', 'Association in PharmGKB','In PharmGKB Curated Paper', '# Papers'),
@@ -355,7 +356,7 @@ server <- function(input, output, session) {
     table <- tableData()
     piecounts <- NULL
     if (nrow(table) > 0) {
-      piecounts <- aggregate(table$citation_count,by=list(table$chemical_normalized),FUN=sum)
+      piecounts <- aggregate(table$paper_count,by=list(table$chemical_normalized),FUN=sum)
       colnames(piecounts) <- c('label','total_freq')
       piecounts <- piecounts[order(piecounts$total_freq,decreasing=T),]
       
@@ -412,7 +413,7 @@ server <- function(input, output, session) {
     table[table$gene_names=='','gene_names'] <- '[unknown]'
     piecounts <- NULL
     if (nrow(table) > 0) {
-      piecounts <- aggregate(table$citation_count,by=list(table$gene_names),FUN=sum)
+      piecounts <- aggregate(table$paper_count,by=list(table$gene_names),FUN=sum)
       if (nrow(piecounts) > 0) {
         colnames(piecounts) <- c('label','total_freq')
         piecounts <- piecounts[order(piecounts$total_freq,decreasing=T),]
@@ -468,7 +469,7 @@ server <- function(input, output, session) {
     table <- tableData()
     piecounts <- NULL
     if (nrow(table) > 0) {
-      piecounts <- aggregate(table$citation_count,by=list(table$variant_normalized),FUN=sum)
+      piecounts <- aggregate(table$paper_count,by=list(table$variant_normalized),FUN=sum)
       colnames(piecounts) <- c('label','total_freq')
       piecounts <- piecounts[order(piecounts$total_freq,decreasing=T),]
       
