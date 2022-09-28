@@ -15,9 +15,7 @@ if __name__ == '__main__':
 	pediatricTerms = set(['Pediatrics','Infant','Infant, Newborn','Child','Child, Preschool','Adolescent'])
 	pediatricPMIDs = []
 
-	#with bioc.BioCXMLDocumentReader(args.inBioc) as parser:
-	with open(args.inBioc,'rb') as f:
-		parser = bioc.BioCXMLDocumentReader(f)
+	with bioc.biocxml.iterparse(open(args.inBioc, 'rb')) as parser:
 		for i,doc in enumerate(parser):
 			if not ('pmid' in doc.infons and doc.infons['pmid'] and doc.infons['pmid'] != 'None'):
 				continue
