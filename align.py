@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
 	pmids = set()
 
-	with bioc.BioCXMLDocumentReader(args.inBioc) as parser:
+	with bioc.biocxml.iterparse(open(args.inBioc, 'rb')) as parser:
 		for i,doc in enumerate(parser):
 			if 'pmid' in doc.infons and doc.infons['pmid'] != 'None':
 				pmid = int(doc.infons['pmid'])
@@ -49,8 +49,9 @@ if __name__ == '__main__':
 
 
 	currentID = 1
-	writer = bioc.BioCXMLDocumentWriter(args.outBioc)
-	with bioc.BioCXMLDocumentReader(args.inBioc) as parser:
+	with bioc.biocxml.iterparse(
+		open(args.inBioc, 'rb')
+	) as parser, bioc.biocxml.iterwrite(args.outBioc) as writer:
 		for i,doc in enumerate(parser):
 			for passage in doc.passages:
 				passage.annotations = []
