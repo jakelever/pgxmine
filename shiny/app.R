@@ -12,6 +12,10 @@ library(stringr)
 wd <- setwd(".")
 setwd(wd)
 
+#####################
+# Load PGxMine data #
+#####################
+
 sentencesFilename <- 'pgxmine_sentences.tsv'
 collatedFilename <- 'pgxmine_collated.tsv'
 
@@ -23,7 +27,12 @@ pgxmine_modifiedDate <- strsplit(as.character(fileInfo$mtime), ' ')[[1]][1]
 sentences <- fread(sentencesFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
 collated <- fread(collatedFilename,sep='\t',header=T,stringsAsFactors=T,quote='', encoding = 'UTF-8')
 
+# Order sentences by publication date
 sentences <- sentences[order(sentences$year,sentences$month,sentences$day,decreasing=T),]
+
+######################
+# Load PharmGKB data #
+######################
 
 pharmGKBFilenames <- c('var_drug_ann.tsv','var_fa_ann.tsv','var_pheno_ann.tsv')
 pharmGKB <- as.data.table(matrix(nrow=0,ncol=2))
@@ -38,7 +47,8 @@ for (pharmGKBFilename in pharmGKBFilenames) {
   
   tempPharmGKB <- fread(pharmGKBFilename,sep='\t',header=T,stringsAsFactors=T,quote='')
   pharmGKB_pmids <- c(pharmGKB_pmids,tempPharmGKB$PMID)
-  tempPharmGKB <- tempPharmGKB[,c('Variant','Chemical')]
+  tempPharmGKB <- tempPharmGKB[,c('Variant/Haplotypes','Drug(s)')]
+  colnames(tempPharmGKB) <- c('Variant','Chemical')
   
   pharmGKB <- rbind(pharmGKB,tempPharmGKB)
 }
@@ -47,11 +57,14 @@ pharmGKB_pmids <- unique(sort(pharmGKB_pmids))
 # Get the most recent modified date of the PharmGKB files loaded
 pharmGKB_modifiedDate <- sort(pharmGKB_modifiedDates,decreasing=T)[1]
 
-#pharmGKB <- pharmGKB[grep(",",pharmGKB$Chemical,fixed=TRUE),]
+######################################################
+# Process PharmGKB data for matching against PGxMine #
+######################################################
+
 pharmGKB$Chemical <- gsub('"','',pharmGKB$Chemical)
 
-
-# Unroll PharmGKB
+# Unroll PharmGKB (i.e. chemicals that are really lists are 
+# turned into multiple rows with one for each chemical)
 s <- strsplit(pharmGKB$Chemical, split = ",")
 pharmGKB <- data.frame(Variant = rep(pharmGKB$Variant, sapply(s, length)), Chemical = unlist(s))
 pharmGKB$Chemical <- trimws(pharmGKB$Chemical)
@@ -80,8 +93,9 @@ pharmGKB3 <- NA
 pharmGKB$Variant <- gsub("*0","*", pharmGKB$Variant, fixed=T)
 collated$variant_id_edited <- gsub("*0","*", collated$variant_id, fixed=T)
 
-#collated$variant_id_edited <- as.character(collated$variant_id_edited)
-#pharmGKB$Variant <- as.character(pharmGKB$Variant)
+#########################################
+# Map variants using star allele lookup #
+#########################################
 
 starRSMapping <- read.table('starRSMappings.tsv',sep='\t',header=T)
 starRSMapping$geneAndAllele <- paste(starRSMapping$gene,starRSMapping$allele,sep='*')
@@ -90,6 +104,9 @@ for(i in 1:nrow(starRSMapping)) {
   pharmGKB$Variant[pharmGKB$Variant==starRSMapping$geneAndAllele[i]] <- as.character(starRSMapping$rsid[i])
 }
 
+#######################################################
+# More preparations for matching PharmGKB and PGxMine #
+#######################################################
 
 pharmGKB$Chemical_ID_Variant <- paste(pharmGKB$Chemical_ID,pharmGKB$Variant)
 pharmGKB$Chemical_ID_Variant[pharmGKB$Chemical_ID==''] <- ''
@@ -102,27 +119,17 @@ pharmGKB$Chemical_ID_Variant[starAlleles] <- gsub("[A-Z]$","",pharmGKB$Chemical_
 starAlleles <- grep("*",collated$variant_id,fixed=T)
 collated$Chemical_ID_Variant[starAlleles] <- gsub("[A-Z]$","",collated$Chemical_ID_Variant[starAlleles])
 
-
-#collated$Chemical_ID_Variant <- gsub('*57:01:01','*5701',collated$Chemical_ID_Variant,fixed=T)
-#collated$Chemical_ID_Variant <- gsub('*57:01','*5701',collated$Chemical_ID_Variant,fixed=T)
-
+##################################
+# Match PGxMine against PharmGKB #
+##################################
 
 sentences$pmid_in_pharmgkb <- sentences$pmid %in% pharmGKB_pmids
-
-#chemicalIgnoreList <- c('statin')
-#sentences <- sentences[!(tolower(sentences$chemical_intext) %in% chemicalIgnoreList),]
 
 collatedNoNA <- is.na(collated$gene_names)
 s <- strsplit(as.character(collated$gene_names), split = ",")
 genesToMatchingID <- data.frame(matching_id = rep(collated$matching_id, sapply(s, length)), gene_name = unlist(s))
 genesToMatchingID$gene_name <- trimws(genesToMatchingID$gene_name)
 s <- NULL
-
-chemicals <- sort(unique(as.character(collated$chemical_normalized)))
-genes <- sort(unique(as.character(genesToMatchingID$gene_name)))
-variants <- sort(unique(as.character(collated$variant_normalized)))
-
-variantTypes <- sort(unique(as.character(collated$variant_type)))
 
 collated$chemical_in_pharmgkb <- collated$chemical_pharmgkb_id %in% pharmGKB$Chemical_ID
 
@@ -138,15 +145,27 @@ associationsWithAnnotatedPaper <- unique(sentences$matching_id[sentences$pmid_in
 collated$in_pharmgkb_paper <- F
 collated[collated$matching_id %in% associationsWithAnnotatedPaper,'in_pharmgkb_paper'] <- T
 
+######################################
+# Get lists of chemicals, genes, etc #
+######################################
+
+chemicals <- sort(unique(as.character(collated$chemical_normalized)))
+genes <- sort(unique(as.character(genesToMatchingID$gene_name)))
+variants <- sort(unique(as.character(collated$variant_normalized)))
+
+variantTypes <- sort(unique(as.character(collated$variant_type)))
+
+################
+# Final set up #
+################
+
+# Adding PubMed links
 sentences$pubmed_link <- paste("<a target=\"_blank\" href='https://www.ncbi.nlm.nih.gov/pubmed/", sentences$pmid, "'>", sentences$pmid, "</a>", sep='')
 
+# Adding various bits of text
 associationTableExplanation <- "<br /><b>Association Table:</b><br />The table below shows a list of extracted chemical-variant associations. Click on one and examine the table further below to see the individual sentences. Variants and chemicals are normalized back to PharmGKB entities. Blank values show where this has not been possible.<br /><br />"
-
 paperSentenceTableExplanation <- "<br /><br /><br /><b>Sentence Table:</b><br />Select a chemical-variant association in the table above to see sentences and publication information<br /><br />"
-
 lastModifiedText = paste("PGxMine updated on ",pgxmine_modifiedDate, " Comparing against PharmGKB last downloaded on ", pharmGKB_modifiedDate, sep="")
-
-
 
 # Some cleanup
 collated[,Chemical_ID_Variant:=NULL]
