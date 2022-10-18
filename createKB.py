@@ -80,6 +80,7 @@ if __name__ == '__main__':
 
 	pediatricPMIDs = set( int(pmid) for pmid,terms in relevantMeSH.items() if any( t in pediatricTerms for t in terms ) )
 	adultPMIDs = set( int(pmid) for pmid,terms in relevantMeSH.items() if any( t in adultTerms for t in terms ) )
+	pmidToRelevantMeSH = { int(pmid):[t for t in terms if t in pediatricTerms or t in adultTerms] for pmid,terms in relevantMeSH.items() }
 	print("Loaded mesh PMIDs for pediatric/adult terms")
 
 	# Fix mapping of some popular variants to the correct SNP
@@ -96,7 +97,7 @@ if __name__ == '__main__':
 	obviousMistakes = {('Abacavir','HLA-B*15:02'),('Allopurinol','HLA-B*15:02'),('Carbamazepine','HLA-B*57:01'),('Allopurinol','HLA-B*57:01'),('Carbamazepine','HLA-B*58:01'),('Abacavir','HLA-B*58:01')}
 	chemicalExclusions = {'cc and tc', 'cc+tc', 'cc + tc','whitehall ii','rvoto','lev-pae','oxaipn','luminal b','oxc-mpe','rapid stemi','vp40e'}
 
-	headers = ['pmid','title','journal','journal_short','year','month','day','is_pediatric_paper','is_adult_paper','section','subsection','chemical_mesh_id','chemical_pharmgkb_id','chemical_drugbank_id','chemical_text','chemical_normalized','chemical_position','variant_id','variant_type','variant_text','variant_normalized','variant_position','gene_ids','gene_names','score','sentence','formatted_sentence']
+	headers = ['pmid','title','journal','journal_short','year','month','day','is_pediatric_paper','is_adult_paper','age_mesh_tags','section','subsection','chemical_mesh_id','chemical_pharmgkb_id','chemical_drugbank_id','chemical_text','chemical_normalized','chemical_position','variant_id','variant_type','variant_text','variant_normalized','variant_position','gene_ids','gene_names','score','sentence','formatted_sentence']
 	with open(args.outKB,'w') as outF:
 		outF.write("\t".join(headers) + "\n")
 
@@ -152,6 +153,7 @@ if __name__ == '__main__':
 
 				is_pediatric_paper = pmid and int(pmid) in pediatricPMIDs
 				is_adult_paper = pmid and int(pmid) in adultPMIDs
+				age_mesh_tags = "|".join(pmidToRelevantMeSH[int(pmid)]) if int(pmid) in pmidToRelevantMeSH else ""
 
 				journal_short = journal
 				if len(journal_short) > 50:
@@ -318,7 +320,7 @@ if __name__ == '__main__':
 					sentence = doc.text.replace('’',"'")
 					formatted_sentence = utils.getFormattedDoc(doc, chemicals + variants + genes)
 
-					outData = [ pmid, title, journal, journal_short, year, month, day, is_pediatric_paper, is_adult_paper, section, subsection, chemical_mesh_id, chemical_pharmgkb_id, chemical_drugbank_id, chemical_text, chemical_normalized, chemical_position, variant_id, variant_type, variant_text, variant_normalized, variant_position, gene_ids, gene_names, score, sentence, formatted_sentence ]
+					outData = [ pmid, title, journal, journal_short, year, month, day, is_pediatric_paper, is_adult_paper, age_mesh_tags, section, subsection, chemical_mesh_id, chemical_pharmgkb_id, chemical_drugbank_id, chemical_text, chemical_normalized, chemical_position, variant_id, variant_type, variant_text, variant_normalized, variant_position, gene_ids, gene_names, score, sentence, formatted_sentence ]
 
 					allowedUnicode = {'title','journal','journal_short','chemical_text','variant_text','sentence','formatted_sentence'}
 
