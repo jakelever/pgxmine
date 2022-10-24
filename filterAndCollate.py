@@ -24,6 +24,9 @@ if __name__ == '__main__':
 
 	pubmedInputFiles = [ f for f in os.listdir(args.inData) if f.startswith('pubmed') and f.endswith('.tsv') ]
 	pmcInputFiles = [ f for f in os.listdir(args.inData) if f.startswith('pmc') and f.endswith('.tsv') ]
+
+	print("Found %d PubMed files" % len(pubmedInputFiles))
+	print("Found %d PMC files" % len(pmcInputFiles))
 	
 	# Process PMC files before PubMed, and newer before older to get the latest version of each document
 	inputFiles = sorted(pmcInputFiles,reverse=True) + sorted(pubmedInputFiles,reverse=True)
