@@ -60,18 +60,7 @@ gunzip -c annotations.variant_star_rs.bioc.xml.gz > data/annotations.variant_sta
 
 # Example Run
 
-There is an example input file in the example directory which contains a couple PubMed abstracts in BioC format. The run\_example.sh script does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv.
-
-```
-# Parse and find sentences that mention a chemical, variant and likely a pharmacogenomic assocation (using filter terms)
-python findPGxSentences.py --inBioc example/aligned.bioc.xml --filterTermsFile pgx_filter_terms.txt --outBioc example/sentences.bioc.xml
-
-# Train relation classifiers (using the annotations* files as training data), filter for specific chemicals and apply the classifiers to extract associations and output with normalized genes, variants and chemicals
-python createKB.py --trainingFiles annotations.variant_star_rs.bioc.xml,annotations.variant_other.bioc.xml --inBioC example/sentences.bioc.xml --selectedChemicals selected_chemicals.json --dbsnp dbsnp_selected.tsv --variantStopwords stopword_variants.txt --genes gene_names.tsv  --outKB example/kb.tsv
-
-# Collate the output of createKB (which in a full run would be ~1800 files) and filter using the relation probability and collated by counting number of papers
-python filterAndCollate.py --inData example --outUnfiltered example/mini_unfiltered.tsv --outCollated example/mini_collated.tsv --outSentences example/mini_sentences.tsv
-```
+There is an example input file in the [example directory](https://github.com/jakelever/pgxmine/tree/master/example) which contains an PubMed abstract in BioC format. The [run\_example.sh script](https://github.com/jakelever/pgxmine/blob/master/run_example.sh) does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv.
 
 # Running with Snakemake
 
@@ -94,6 +83,7 @@ Here is a summary of the main script files. The Snakefile manages the execution 
 ## Main scripts
 
 - **[findPGxSentences.py](https://github.com/jakelever/pgxmine/blob/master/findPGxSentences.py)**: Identify star alleles then find sentences that mention a chemical and variant
+- **[getRelevantMeSH.py](https://github.com/jakelever/pgxmine/blob/master/getRelevantMeSH.py)**: Extracts MeSH terms related to age groups that is used by additional analysis
 - **[createKB.py](https://github.com/jakelever/pgxmine/blob/master/createKB.py)**: Train and apply a relation classifier to extract pharmacogenomic chemical/variant associations
 - **[filterAndCollate.py](https://github.com/jakelever/pgxmine/blob/master/filterAndCollate.py)**: Filter the results to reduce false positives and collate the associations
 - **[utils/__init__.py](https://github.com/jakelever/pgxmine/blob/master/utils/__init__.py)**: Big functions for variant normalization and outputting the formatted sentences
