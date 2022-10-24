@@ -6,9 +6,9 @@ __pycache__
 
 data/
 
-example/aligned.bioc.xml
-example/sentences.bioc.xml
-example/kb.tsv
+example/pubmed_26736037.kb.tsv
+example/pubmed_26736037.mesh.json.gz
+example/pubmed_26736037.sentences.bioc.xml
 example/mini_unfiltered.tsv
 example/mini_collated.tsv
 example/mini_sentences.tsv
