@@ -12,8 +12,11 @@ elif os.getenv('MODE') == 'test':
 	source_dir = 'test_data'
 	work_dir = 'test_working'
 
-mesh_files = [ '%s/mesh/%s' % (work_dir,f.replace('.bioc.xml','.json.gz')) for f in os.listdir(source_dir) if f.startswith('pubmed') ]
-kb_files = [ '%s/kb/%s' % (work_dir,f.replace('.bioc.xml','.tsv')) for f in os.listdir(source_dir) ]
+input_files = [ f for f in os.listdir(source_dir) if f.endswith('.bioc.xml') ]
+assert len(input_files) > 0, "Could not find any BioC XML files to process"
+
+mesh_files = [ '%s/mesh/%s' % (work_dir,f.replace('.bioc.xml','.json.gz')) for f in input_files if f.startswith('pubmed') ]
+kb_files = [ '%s/kb/%s' % (work_dir,f.replace('.bioc.xml','.tsv')) for f in input_files ]
 
 final_files = [ "%s/%s" % (work_dir,f) for f in ['pgxmine_unfiltered.tsv','pgxmine_collated.tsv','pgxmine_sentences.tsv'] ]
 

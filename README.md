@@ -60,11 +60,11 @@ gunzip -c annotations.variant_star_rs.bioc.xml.gz > data/annotations.variant_sta
 
 # Example Run
 
-There is an example input file in the [example directory](https://github.com/jakelever/pgxmine/tree/master/example) which contains an PubMed abstract in BioC format. The [run\_example.sh script](https://github.com/jakelever/pgxmine/blob/master/run_example.sh) does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv.
+There is an example input file in the [test\_data directory](https://github.com/jakelever/pgxmine/tree/master/test_data) which contains an PubMed abstract in BioC format. The [run\_example.sh script](https://github.com/jakelever/pgxmine/blob/master/run_example.sh) does a full run extracting chemical/variant associations and is shown below with comments. The final output is three files: mini\_unfiltered.tsv, mini\_collated.tsv, mini\_sentences.tsv. This is equivalent to the test run with snakemake shown below.
 
 # Running with Snakemake
 
-To run a small example of the pipeline using snakemake, run the command below.
+To run a small example of the pipeline using snakemake, run the command below. This runs on the data in the [test\_data directory](https://github.com/jakelever/pgxmine/tree/master/test_data). It is equivalent to the commands in the [run\_example.sh script](https://github.com/jakelever/pgxmine/blob/master/run_example.sh) which provides some comments on what each step does. Snakemake is useful for running on the larger datasets with the full run commands further down.
 
 ```
 MODE=test snakemake --cores 1

@@ -6,12 +6,12 @@ __pycache__
 
 data/
 
-example/pubmed_26736037.kb.tsv
-example/pubmed_26736037.mesh.json.gz
-example/pubmed_26736037.sentences.bioc.xml
-example/mini_unfiltered.tsv
-example/mini_collated.tsv
-example/mini_sentences.tsv
+test_data/pubmed_26736037.kb.tsv
+test_data/pubmed_26736037.mesh.json.gz
+test_data/pubmed_26736037.sentences.bioc.xml
+test_data/mini_unfiltered.tsv
+test_data/mini_collated.tsv
+test_data/mini_sentences.tsv
 
 .Rproj.user
 *.Rproj
